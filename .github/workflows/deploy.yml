@@ -28,7 +28,7 @@ jobs:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_TTEEWWKKRR }}'
           channelId: live
-          projectId: webpage-349c7
+          projectId: tteewwkkrr
 
       - name: Cloudflare Purge Cache
         uses: jakejarvis/cloudflare-purge-action@v0.3.0
