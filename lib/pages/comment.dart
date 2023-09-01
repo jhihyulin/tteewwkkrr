@@ -130,7 +130,9 @@ class _CommentPageState extends State<CommentPage> {
             for (var department in key['department']) {
               depList.add(department['department']);
             }
-            departmentList[college] = depList;
+            setState(() {
+              departmentList[college] = depList;
+            });
           }
           debugPrint('departmentList: ${departmentList.toString()}');
         } else {
@@ -292,8 +294,6 @@ class _CommentPageState extends State<CommentPage> {
                                   onChanged: (value) {
                                     setState(() {
                                       _selectedCollege = value.toString();
-                                      _selectedDepartment =
-                                          _selectedDepartmentDefault;
                                     });
                                   },
                                   items: () {
@@ -303,10 +303,12 @@ class _CommentPageState extends State<CommentPage> {
                                       child: Text(_selectedCollegeDefault),
                                     ));
                                     for (var key in departmentList.keys) {
-                                      items.add(DropdownMenuItem(
-                                        value: key,
-                                        child: Text(key),
-                                      ));
+                                      items.add(
+                                        DropdownMenuItem(
+                                          value: key,
+                                          child: Text(key),
+                                        ),
+                                      );
                                     }
                                     return items;
                                   }(),
@@ -338,10 +340,12 @@ class _CommentPageState extends State<CommentPage> {
                                               .containsKey(college)) {
                                             for (var department
                                                 in departmentList[college]!) {
-                                              items.add(DropdownMenuItem(
-                                                value: department,
-                                                child: Text(department),
-                                              ));
+                                              items.add(
+                                                DropdownMenuItem(
+                                                  value: department,
+                                                  child: Text(department),
+                                                ),
+                                              );
                                             }
                                           }
                                           return items;
@@ -474,11 +478,27 @@ class _CommentPageState extends State<CommentPage> {
                 ),
                 if (_isSearching)
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(4),
                     child: const CustomLinearProgressIndicator(),
                   ),
                 Wrap(
                   children: [
+                    if (_searchResult != null)
+                      CustomCard(
+                        child: ListTile(
+                          title: const Text('搜尋結果'),
+                          leading: const Icon(Icons.search),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.close),
+                            tooltip: '清除搜尋結果',
+                            onPressed: () {
+                              setState(() {
+                                _searchResult = null;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
                     if (_searchResult != null)
                       for (var i in _searchResult!.take(100))
                         // 先略過所有的廣告 TODO: 顯示廣告
