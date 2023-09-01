@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="tteewwkkrr">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="tteewwkkrr">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/logo/180.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="icons/logo/192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="icons/logo/180.png" />
+
+  <title>tteewwkkrr</title>
+  <link rel="manifest" href="manifest.json">
+
+  <script>
+    // The value below is injected by flutter build, do not touch.
+    var serviceWorkerVersion = null;
+  </script>
+  <!-- This script adds the flutter initialization JS code -->
+  <script src="flutter.js" defer></script>
+  <style>
+    .loading {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      -ms-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+    }
+
+    .loader {
+      border: 12px solid;
+      border-radius: 50%;
+      border-left: 12px solid;
+      width: 120px;
+      height: 120px;
+      -webkit-animation: spin 1s linear infinite;
+      animation: spin 1s linear infinite;
+    }
+
+    .flutter-loader {
+      display: none;
+    }
+
+    html,
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    @media (prefers-color-scheme: light) {
+      body {
+        background: #FFFFFF;
+        color: #202124;
+      }
+
+      a {
+        color: #1A73E8;
+      }
+
+      .loader {
+        border-color: #FFFFFF;
+        border-left-color: #202124;
+      }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: #292A2D;
+        color: #E8EAED;
+      }
+
+      a {
+        color: #8AB4F8;
+      }
+
+      .loader {
+        border-color: #292A2D;
+        border-left-color: #E8EAED;
+      }
+    }
+
+    @-webkit-keyframes spin {
+      0% {
+        -webkit-transform: rotate(0deg);
+      }
+
+      100% {
+        -webkit-transform: rotate(360deg);
+      }
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="loading">
+    <script>
+      document.getElementsByClassName('loading')[0].innerHTML = '<div class="loader"></div>';
+    </script>
+    <noscript>
+      <p>本網站使用Flutter框架開發，建立於Dart語言之上。</p>
+      <p>經構建後轉譯成JavaScript，並由Canvas Kit渲染。</p>
+      <p>因此，使用本網站必須啟用JavaScript，否則所有功能無法使用。</p>
+      <a href="https://www.enable-javascript.com/">如何在您的瀏覽器中啟用JavaScript</a>
+    </noscript>
+  </div>
+  <script>
+    window.addEventListener('load', function (ev) {
+      // Download main.dart.js
+      _flutter.loader.loadEntrypoint({
+        serviceWorker: {
+          serviceWorkerVersion: serviceWorkerVersion,
+        }
+      }).then(function (engineInitializer) {
+        return engineInitializer.initializeEngine();
+      }).then(function (appRunner) {
+        var loadingIndicator = document.getElementsByClassName('loading')[0];
+        if (loadingIndicator) {
+          // hide loading indicator with Fade out effect
+          setTimeout(function () {
+            loadingIndicator.style.display = 'none';
+          }, 10000);
+        }
+        return appRunner.runApp();
+      });
+    });
+  </script>
+</body>
+
+</html>
