@@ -49,8 +49,6 @@ class _CommentPageState extends State<CommentPage> {
   ];
   late bool _isSearching;
   late List<dynamic>? _searchResult;
-  final TextEditingController _courseController = TextEditingController();
-  final TextEditingController _teacherController = TextEditingController();
 
   @override
   void initState() {
@@ -219,6 +217,7 @@ class _CommentPageState extends State<CommentPage> {
   }
 
   bool isSpam(String comment) {
+    // TODO: 加上其他檢測方案
     for (var spam in ['湊三篇']) {
       if (comment.contains(spam)) {
         return true;
