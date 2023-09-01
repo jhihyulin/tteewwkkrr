@@ -49,6 +49,8 @@ class _CommentPageState extends State<CommentPage> {
   ];
   late bool _isSearching;
   late List<dynamic>? _searchResult;
+  final TextEditingController _courseController = TextEditingController();
+  final TextEditingController _teacherController = TextEditingController();
 
   @override
   void initState() {
@@ -277,6 +279,12 @@ class _CommentPageState extends State<CommentPage> {
                                 },
                                 hintText: '請輸入課程名稱',
                                 labelText: '課程名稱',
+                                optionsMaxWidth:
+                                    MediaQuery.of(context).size.width * 0.9 <
+                                            400
+                                        ? MediaQuery.of(context).size.width *
+                                            0.9
+                                        : 400,
                               ),
                               const SizedBox(
                                 height: 10,
@@ -298,6 +306,12 @@ class _CommentPageState extends State<CommentPage> {
                                 },
                                 hintText: '請輸入教師姓名',
                                 labelText: '教師姓名',
+                                optionsMaxWidth:
+                                    MediaQuery.of(context).size.width * 0.9 <
+                                            400
+                                        ? MediaQuery.of(context).size.width *
+                                            0.9
+                                        : 400,
                               ),
                               const SizedBox(
                                 height: 10,
@@ -332,7 +346,8 @@ class _CommentPageState extends State<CommentPage> {
                                   DropdownButtonFormField(
                                     validator: (value) {
                                       if (_selectedCollege !=
-                                          _selectedCollegeDefault && value == _selectedDepartmentDefault) {
+                                              _selectedCollegeDefault &&
+                                          value == _selectedDepartmentDefault) {
                                         return '$_selectedDepartmentDefault或取消選擇學院';
                                       }
                                       return null;
