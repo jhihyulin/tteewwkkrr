@@ -48,7 +48,10 @@ class HomePage extends StatelessWidget {
       body: Center(
         child: Container(
           constraints: const BoxConstraints(maxWidth: 600),
-          height:MediaQuery.of(context).size.height - AppBar().preferredSize.height - MediaQuery.of(context).padding.top - MediaQuery.of(context).padding.bottom,
+          height: MediaQuery.of(context).size.height -
+              AppBar().preferredSize.height -
+              MediaQuery.of(context).padding.top -
+              MediaQuery.of(context).padding.bottom,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -59,6 +62,9 @@ class HomePage extends StatelessWidget {
               CustomCard(
                 child: Column(
                   children: [
+                    const SizedBox(
+                      height: 10,
+                    ),
                     ListTile(
                       title: const Text('搜尋課程評論'),
                       trailing: IconButton(
@@ -76,6 +82,9 @@ class HomePage extends StatelessWidget {
                         icon: Icon(Icons.chevron_right),
                         onPressed: null,
                       ),
+                    ),
+                    const SizedBox(
+                      height: 10,
                     ),
                   ],
                 ),

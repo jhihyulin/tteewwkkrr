@@ -2,10 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:universal_html/html.dart';
 
 import '../widget/card.dart';
 import '../widget/expansion_tile.dart';
+import '../widget/linear_progress_indicator.dart';
 
 class CommentPage extends StatefulWidget {
   const CommentPage({Key? key}) : super(key: key);
@@ -46,6 +46,8 @@ class _CommentPageState extends State<CommentPage> {
     '有點困難',
     '非常困難',
   ];
+  late bool _isSearching;
+  late List<dynamic>? _searchResult;
 
   @override
   void initState() {
@@ -59,6 +61,8 @@ class _CommentPageState extends State<CommentPage> {
     _selectedSemester = _selectedSemesterDefault;
     _selectedHard = _selectedHardDefault;
     _selectedRecommend = _selectedRecommendDefault;
+    _searchResult = null;
+    _isSearching = false;
     getCourses();
     getTeachers();
     getDepartments();
@@ -144,6 +148,10 @@ class _CommentPageState extends State<CommentPage> {
 
   void search(String? token, String? year, String? course, String? department,
       String? teacher, String? hard, String? recommend) async {
+    setState(() {
+      _searchResult = null;
+      _isSearching = true;
+    });
     var uri = Uri.parse('$baseURL/search');
     var dealYear = year != null
         ? year.length == 5
@@ -188,7 +196,10 @@ class _CommentPageState extends State<CommentPage> {
         var data = jsonDecode(response.body);
         if (data['code'] == 200) {
           var result = data['result'];
-          debugPrint('search: ${result.toString()}');
+          setState(() {
+            _searchResult = result;
+          });
+          // debugPrint('search: ${result.toString()}');
         } else {
           debugPrint(
               '[ERROR] search: ${response.statusCode} ${data['code']} ${data['msg']} ${response.body}');
@@ -196,7 +207,19 @@ class _CommentPageState extends State<CommentPage> {
       } else {
         debugPrint('[ERROR] search: ${response.statusCode} ${response.body}');
       }
+      setState(() {
+        _isSearching = false;
+      });
     });
+  }
+
+  bool isSpam(String comment) {
+    for (var spam in ['湊三篇']) {
+      if (comment.contains(spam)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @override
@@ -205,246 +228,300 @@ class _CommentPageState extends State<CommentPage> {
       appBar: AppBar(
         title: const Text('搜尋課程評論'),
       ),
-      body: Center(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 600),
-          height: MediaQuery.of(context).size.height -
-              AppBar().preferredSize.height -
-              MediaQuery.of(context).padding.top -
-              MediaQuery.of(context).padding.bottom,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CustomCard(
-                child: CustomExpansionTile(
-                  title: const Text('搜尋'),
-                  leading: const Icon(Icons.search),
-                  initiallyExpanded: true,
-                  children: [
-                    Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          Autocomplete<String>(
-                            optionsBuilder:
-                                (TextEditingValue textEditingValue) {
-                              if (textEditingValue.text == '') {
-                                return const Iterable.empty();
-                              }
-                              return coursesList.where((String option) {
-                                return option.contains(
-                                    textEditingValue.text.toUpperCase());
-                              });
-                            },
-                            onSelected: (selection) {
-                              debugPrint('selected $selection');
-                              _selectedCourse = selection;
-                            },
-                          ),
-                          Autocomplete<String>(
-                            optionsBuilder:
-                                (TextEditingValue textEditingValue) {
-                              if (textEditingValue.text == '') {
-                                return const Iterable.empty();
-                              }
-                              return teachersList.where((String option) {
-                                return option.contains(
-                                    textEditingValue.text.toUpperCase());
-                              });
-                            },
-                            onSelected: (selection) {
-                              debugPrint('selected $selection');
-                              _selectedTeacher = selection;
-                            },
-                          ),
-                          Wrap(
-                            children: [
-                              DropdownButton(
-                                hint: Text(_selectedCollegeDefault),
-                                value: _selectedCollege,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _selectedCollege = value.toString();
-                                    _selectedDepartment =
-                                        _selectedDepartmentDefault;
-                                  });
-                                },
-                                items: () {
-                                  List<DropdownMenuItem<String>> items = [];
-                                  items.add(DropdownMenuItem(
-                                    value: _selectedCollegeDefault,
-                                    child: Text(_selectedCollegeDefault),
-                                  ));
-                                  for (var key in departmentList.keys) {
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Center(
+          child: Container(
+            constraints: BoxConstraints(
+              maxWidth: 600,
+              minHeight: MediaQuery.of(context).size.height -
+                  AppBar().preferredSize.height -
+                  MediaQuery.of(context).padding.top -
+                  MediaQuery.of(context).padding.bottom,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CustomCard(
+                  child: CustomExpansionTile(
+                    title: const Text('搜尋'),
+                    leading: const Icon(Icons.search),
+                    initiallyExpanded: true,
+                    children: [
+                      Form(
+                        key: _formKey,
+                        child: Column(
+                          children: [
+                            Autocomplete<String>(
+                              optionsBuilder:
+                                  (TextEditingValue textEditingValue) {
+                                if (textEditingValue.text == '') {
+                                  return const Iterable.empty();
+                                }
+                                return coursesList.where((String option) {
+                                  return option.contains(
+                                      textEditingValue.text.toUpperCase());
+                                });
+                              },
+                              onSelected: (selection) {
+                                debugPrint('selected $selection');
+                                _selectedCourse = selection;
+                              },
+                            ),
+                            Autocomplete<String>(
+                              optionsBuilder:
+                                  (TextEditingValue textEditingValue) {
+                                if (textEditingValue.text == '') {
+                                  return const Iterable.empty();
+                                }
+                                return teachersList.where((String option) {
+                                  return option.contains(
+                                      textEditingValue.text.toUpperCase());
+                                });
+                              },
+                              onSelected: (selection) {
+                                debugPrint('selected $selection');
+                                _selectedTeacher = selection;
+                              },
+                            ),
+                            Wrap(
+                              children: [
+                                DropdownButton(
+                                  hint: Text(_selectedCollegeDefault),
+                                  value: _selectedCollege,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _selectedCollege = value.toString();
+                                      _selectedDepartment =
+                                          _selectedDepartmentDefault;
+                                    });
+                                  },
+                                  items: () {
+                                    List<DropdownMenuItem<String>> items = [];
                                     items.add(DropdownMenuItem(
-                                      value: key,
-                                      child: Text(key),
+                                      value: _selectedCollegeDefault,
+                                      child: Text(_selectedCollegeDefault),
                                     ));
-                                  }
-                                  return items;
-                                }(),
-                              ),
-                              DropdownButton(
-                                hint: Text(_selectedDepartmentDefault),
-                                value:
-                                    _selectedCollege == _selectedCollegeDefault
-                                        ? null
-                                        : _selectedDepartment,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _selectedDepartment = value.toString();
-                                  });
-                                },
-                                items: _selectedCollege ==
-                                        _selectedCollegeDefault
-                                    ? null
-                                    : () {
-                                        List<DropdownMenuItem<String>> items =
-                                            [];
-                                        items.add(DropdownMenuItem(
-                                          value: _selectedDepartmentDefault,
-                                          child:
-                                              Text(_selectedDepartmentDefault),
-                                        ));
-                                        var college = _selectedCollege;
-                                        if (departmentList
-                                            .containsKey(college)) {
-                                          for (var department
-                                              in departmentList[college]!) {
-                                            items.add(DropdownMenuItem(
-                                              value: department,
-                                              child: Text(department),
-                                            ));
-                                          }
-                                        }
-                                        return items;
-                                      }(),
-                              ),
-                            ],
-                          ),
-                          DropdownButton(
-                            hint: Text(_selectedSemesterDefault),
-                            value: _selectedSemester,
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedSemester = value.toString();
-                              });
-                            },
-                            items: () {
-                              var items = <DropdownMenuItem<String>>[];
-                              items.add(
-                                DropdownMenuItem(
-                                  value: _selectedSemesterDefault,
-                                  child: Text(_selectedSemesterDefault),
+                                    for (var key in departmentList.keys) {
+                                      items.add(DropdownMenuItem(
+                                        value: key,
+                                        child: Text(key),
+                                      ));
+                                    }
+                                    return items;
+                                  }(),
                                 ),
-                              );
-                              var nowYear = DateTime.now().year - 1911;
-                              for (var year = nowYear; year >= 99; year--) {
-                                items.add(
-                                  DropdownMenuItem(
-                                    value: '$year-2',
-                                    child: Text('$year-2'),
-                                  ),
-                                );
-                                items.add(
-                                  DropdownMenuItem(
-                                    value: '$year-1',
-                                    child: Text('$year-1'),
-                                  ),
-                                );
-                              }
-                              return items;
-                            }(),
-                          ),
-                          Wrap(
-                            children: [
-                              DropdownButton(
-                                hint: Text(_selectedHardDefault),
-                                value: _selectedHard,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _selectedHard = value.toString();
-                                  });
-                                },
-                                items: () {
-                                  List<DropdownMenuItem<String>> items = [];
-                                  items.add(DropdownMenuItem(
-                                    value: _selectedHardDefault,
-                                    child: Text(_selectedHardDefault),
-                                  ));
-                                  for (var hard in _hardList) {
-                                    items.add(DropdownMenuItem(
-                                      value: hard,
-                                      child: Text(hard),
-                                    ));
-                                  }
-                                  return items;
-                                }(),
-                              ),
-                              DropdownButton(
-                                hint: Text(_selectedRecommendDefault),
-                                value: _selectedRecommend,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _selectedRecommend = value.toString();
-                                  });
-                                },
-                                items: () {
-                                  List<DropdownMenuItem<String>> items = [];
-                                  items.add(DropdownMenuItem(
-                                    value: _selectedRecommendDefault,
-                                    child: Text(_selectedRecommendDefault),
-                                  ));
-                                  for (var recommend in _recommendList) {
-                                    items.add(DropdownMenuItem(
-                                      value: recommend,
-                                      child: Text(recommend),
-                                    ));
-                                  }
-                                  return items;
-                                }(),
-                              ),
-                            ],
-                          ),
-                          ElevatedButton.icon(
-                            icon: const Icon(Icons.search),
-                            label: const Text('搜尋'),
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                _formKey.currentState!.save();
-                                search(
-                                  null,
-                                  _selectedSemester == _selectedSemesterDefault
-                                      ? null
-                                      : _selectedSemester,
-                                  _selectedCourse,
-                                  _selectedDepartment ==
-                                              _selectedDepartmentDefault ||
-                                          _selectedDepartment == ''
+                                DropdownButton(
+                                  hint: Text(_selectedDepartmentDefault),
+                                  value: _selectedCollege ==
+                                          _selectedCollegeDefault
                                       ? null
                                       : _selectedDepartment,
-                                  _selectedTeacher,
-                                  _selectedHard == _selectedHardDefault
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _selectedDepartment = value.toString();
+                                    });
+                                  },
+                                  items: _selectedCollege ==
+                                          _selectedCollegeDefault
                                       ? null
-                                      : _selectedHard,
-                                  _selectedRecommend ==
-                                          _selectedRecommendDefault
-                                      ? null
-                                      : _selectedRecommend,
+                                      : () {
+                                          List<DropdownMenuItem<String>> items =
+                                              [];
+                                          items.add(DropdownMenuItem(
+                                            value: _selectedDepartmentDefault,
+                                            child: Text(
+                                                _selectedDepartmentDefault),
+                                          ));
+                                          var college = _selectedCollege;
+                                          if (departmentList
+                                              .containsKey(college)) {
+                                            for (var department
+                                                in departmentList[college]!) {
+                                              items.add(DropdownMenuItem(
+                                                value: department,
+                                                child: Text(department),
+                                              ));
+                                            }
+                                          }
+                                          return items;
+                                        }(),
+                                ),
+                              ],
+                            ),
+                            DropdownButton(
+                              hint: Text(_selectedSemesterDefault),
+                              value: _selectedSemester,
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedSemester = value.toString();
+                                });
+                              },
+                              items: () {
+                                var items = <DropdownMenuItem<String>>[];
+                                items.add(
+                                  DropdownMenuItem(
+                                    value: _selectedSemesterDefault,
+                                    child: Text(_selectedSemesterDefault),
+                                  ),
                                 );
-                              }
-                            },
-                          )
-                        ],
+                                var nowYear = DateTime.now().year - 1911;
+                                for (var year = nowYear; year >= 99; year--) {
+                                  items.add(
+                                    DropdownMenuItem(
+                                      value: '$year-2',
+                                      child: Text('$year-2'),
+                                    ),
+                                  );
+                                  items.add(
+                                    DropdownMenuItem(
+                                      value: '$year-1',
+                                      child: Text('$year-1'),
+                                    ),
+                                  );
+                                }
+                                return items;
+                              }(),
+                            ),
+                            Wrap(
+                              children: [
+                                DropdownButton(
+                                  hint: Text(_selectedHardDefault),
+                                  value: _selectedHard,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _selectedHard = value.toString();
+                                    });
+                                  },
+                                  items: () {
+                                    List<DropdownMenuItem<String>> items = [];
+                                    items.add(DropdownMenuItem(
+                                      value: _selectedHardDefault,
+                                      child: Text(_selectedHardDefault),
+                                    ));
+                                    for (var hard in _hardList) {
+                                      items.add(DropdownMenuItem(
+                                        value: hard,
+                                        child: Text(hard),
+                                      ));
+                                    }
+                                    return items;
+                                  }(),
+                                ),
+                                DropdownButton(
+                                  hint: Text(_selectedRecommendDefault),
+                                  value: _selectedRecommend,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _selectedRecommend = value.toString();
+                                    });
+                                  },
+                                  items: () {
+                                    List<DropdownMenuItem<String>> items = [];
+                                    items.add(DropdownMenuItem(
+                                      value: _selectedRecommendDefault,
+                                      child: Text(_selectedRecommendDefault),
+                                    ));
+                                    for (var recommend in _recommendList) {
+                                      items.add(DropdownMenuItem(
+                                        value: recommend,
+                                        child: Text(recommend),
+                                      ));
+                                    }
+                                    return items;
+                                  }(),
+                                ),
+                              ],
+                            ),
+                            ElevatedButton.icon(
+                              icon: const Icon(Icons.search),
+                              label: const Text('搜尋'),
+                              onPressed: () {
+                                if (_formKey.currentState!.validate()) {
+                                  _formKey.currentState!.save();
+                                  search(
+                                    null,
+                                    _selectedSemester ==
+                                            _selectedSemesterDefault
+                                        ? null
+                                        : _selectedSemester,
+                                    _selectedCourse,
+                                    _selectedDepartment ==
+                                                _selectedDepartmentDefault ||
+                                            _selectedDepartment == ''
+                                        ? null
+                                        : _selectedDepartment,
+                                    _selectedTeacher,
+                                    _selectedHard == _selectedHardDefault
+                                        ? null
+                                        : _selectedHard,
+                                    _selectedRecommend ==
+                                            _selectedRecommendDefault
+                                        ? null
+                                        : _selectedRecommend,
+                                  );
+                                }
+                              },
+                            )
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              Wrap(
-                children: [],
-              )
-            ],
+                if (_isSearching) const CustomLinearProgressIndicator(),
+                Wrap(
+                  children: [
+                    if (_searchResult != null)
+                      for (var i in _searchResult!.take(100))
+                        // 先略過所有的廣告 TODO: 顯示廣告
+                        if (i['ad'] == 0)
+                          CustomCard(
+                            child: CustomExpansionTile(
+                              title: Text('${i['course']}'),
+                              subtitle: Text('${i['teacher']}'),
+                              initiallyExpanded: !isSpam(i['comment']),
+                              children: [
+                                ListTile(
+                                  title: Text('${i['comment']}'),
+                                ),
+                                ListTile(
+                                  title: Text(i['recommend'] == 'E'
+                                      ? _recommendList[0]
+                                      : i['recommend'] == 'D'
+                                          ? _recommendList[1]
+                                          : i['recommend'] == 'C'
+                                              ? _recommendList[2]
+                                              : i['recommend'] == 'B'
+                                                  ? _recommendList[3]
+                                                  : _recommendList[4]),
+                                ),
+                                ListTile(
+                                  title: Text(i['hard'] == 'E'
+                                      ? _hardList[0]
+                                      : i['hard'] == 'D'
+                                          ? _hardList[1]
+                                          : i['hard'] == 'C'
+                                              ? _hardList[2]
+                                              : i['hard'] == 'B'
+                                                  ? _hardList[3]
+                                                  : _hardList[4]),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.only(right: 10),
+                                  width: double.infinity,
+                                  child: Text(
+                                    '${i['department']} ${i['year'].length == 4 ? '1' + i['year'] : '9' + i['year']}',
+                                    textAlign: TextAlign.right,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                  ],
+                )
+              ],
+            ),
           ),
         ),
       ),
