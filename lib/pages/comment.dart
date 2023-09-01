@@ -159,24 +159,24 @@ class _CommentPageState extends State<CommentPage> {
             : year.substring(1, 4)
         : null;
     var dealHard = hard != null
-        ? hard == '非常簡單'
+        ? hard == _hardList[0]
             ? 'E'
-            : hard == '有點簡單'
+            : hard == _hardList[1]
                 ? 'D'
-                : hard == '普通'
+                : hard == _hardList[2]
                     ? 'C'
-                    : hard == '有點困難'
+                    : hard == _hardList[3]
                         ? 'B'
                         : 'A'
         : null;
     var dealRecommend = recommend != null
-        ? recommend == '非常不推薦'
+        ? recommend == _recommendList[0]
             ? 'E'
-            : recommend == '不推薦'
+            : recommend == _recommendList[1]
                 ? 'D'
-                : recommend == '普通'
+                : recommend == _recommendList[2]
                     ? 'C'
-                    : recommend == '推薦'
+                    : recommend == _recommendList[3]
                         ? 'B'
                         : 'A'
         : null;
@@ -462,7 +462,10 @@ class _CommentPageState extends State<CommentPage> {
                                   );
                                 }
                               },
-                            )
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
                           ],
                         ),
                       ),
@@ -482,42 +485,43 @@ class _CommentPageState extends State<CommentPage> {
                               subtitle: Text('${i['teacher']}'),
                               initiallyExpanded: !isSpam(i['comment']),
                               children: [
-                                ListTile(
-                                  title: Text('${i['comment']}'),
-                                ),
-                                ListTile(
-                                  title: Text(i['recommend'] == 'E'
-                                      ? _recommendList[0]
-                                      : i['recommend'] == 'D'
-                                          ? _recommendList[1]
-                                          : i['recommend'] == 'C'
-                                              ? _recommendList[2]
-                                              : i['recommend'] == 'B'
-                                                  ? _recommendList[3]
-                                                  : _recommendList[4]),
-                                ),
-                                ListTile(
-                                  title: Text(i['hard'] == 'E'
-                                      ? _hardList[0]
-                                      : i['hard'] == 'D'
-                                          ? _hardList[1]
-                                          : i['hard'] == 'C'
-                                              ? _hardList[2]
-                                              : i['hard'] == 'B'
-                                                  ? _hardList[3]
-                                                  : _hardList[4]),
-                                ),
                                 Container(
-                                  padding: const EdgeInsets.only(right: 10),
+                                  padding: const EdgeInsets.all(16),
                                   width: double.infinity,
-                                  child: Text(
-                                    '${i['department']} ${i['year'].length == 4 ? '1' + i['year'] : '9' + i['year']}',
-                                    textAlign: TextAlign.right,
-                                  ),
+                                  child: Column(
+                                    children: [
+                                      SizedBox(
+                                        width: double.infinity,
+                                        child: Text(
+                                          '${i['comment']}',
+                                          textAlign: TextAlign.left,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      SizedBox(
+                                        width: double.infinity,
+                                        child: Text(
+                                          '${i['hard'] == 'E' ? _hardList[0] : i['hard'] == 'D' ? _hardList[1] : i['hard'] == 'C' ? _hardList[2] : i['hard'] == 'B' ? _hardList[3] : _hardList[4]} ${i['recommend'] == 'E' ? _recommendList[0] : i['recommend'] == 'D' ? _recommendList[1] : i['recommend'] == 'C' ? _recommendList[2] : i['recommend'] == 'B' ? _recommendList[3] : _recommendList[4]}',
+                                          textAlign: TextAlign.left,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: double.infinity,
+                                        child: Text(
+                                          '${i['department']} ${i['year'].length == 4 ? '1${i['year']}' : '9${i['year']}'}',
+                                          textAlign: TextAlign.right,
+                                        ),
+                                      ),
+                                    ],
+                                  ), //
                                 ),
                               ],
                             ),
                           ),
+                    if (_searchResult != null && _searchResult!.isEmpty)
+                      const Text('沒有搜尋結果'),
                   ],
                 )
               ],
