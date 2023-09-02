@@ -2,12 +2,12 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:tteewwkkrr/widget/drop_down_button_form_field.dart';
 
 import '../widget/card.dart';
 import '../widget/expansion_tile.dart';
 import '../widget/linear_progress_indicator.dart';
 import '../widget/auto_complete.dart';
+import '../widget/drop_down_button_form_field.dart';
 
 class CommentPage extends StatefulWidget {
   const CommentPage({Key? key}) : super(key: key);
@@ -29,11 +29,11 @@ class _CommentPageState extends State<CommentPage> {
   final String _selectedRecommendDefault = '請選擇推薦度';
   late String? _selectedTeacher;
   late String? _selectedCourse;
-  late String _selectedCollege;
-  late String _selectedDepartment;
-  late String _selectedSemester;
-  late String _selectedHard;
-  late String _selectedRecommend;
+  late String? _selectedCollege;
+  late String? _selectedDepartment;
+  late String? _selectedSemester;
+  late String? _selectedHard;
+  late String? _selectedRecommend;
   final List<String> _recommendList = [
     '非常不推薦',
     '不推薦',
@@ -58,11 +58,11 @@ class _CommentPageState extends State<CommentPage> {
     departmentList = {};
     _selectedTeacher = null;
     _selectedCourse = null;
-    _selectedCollege = _selectedCollegeDefault;
-    _selectedDepartment = _selectedDepartmentDefault;
-    _selectedSemester = _selectedSemesterDefault;
-    _selectedHard = _selectedHardDefault;
-    _selectedRecommend = _selectedRecommendDefault;
+    _selectedCollege = null;
+    _selectedDepartment = null;
+    _selectedSemester = null;
+    _selectedHard = null;
+    _selectedRecommend = null;
     _searchResult = null;
     _isSearching = false;
     getCourses();
@@ -238,7 +238,7 @@ class _CommentPageState extends State<CommentPage> {
         child: Center(
           child: Container(
             constraints: BoxConstraints(
-              maxWidth: 600,
+              maxWidth: 700,
               minHeight: MediaQuery.of(context).size.height -
                   AppBar().preferredSize.height -
                   MediaQuery.of(context).padding.top -
@@ -250,6 +250,7 @@ class _CommentPageState extends State<CommentPage> {
                 CustomCard(
                   child: CustomExpansionTile(
                     title: const Text('搜尋'),
+                    subtitle: const Text('想以什麼條件搜尋？'),
                     leading: const Icon(Icons.search),
                     initiallyExpanded: true,
                     children: [
@@ -317,6 +318,8 @@ class _CommentPageState extends State<CommentPage> {
                                 height: 10,
                               ),
                               Wrap(
+                                spacing: 10,
+                                runSpacing: 10,
                                 children: [
                                   CustomDropdownButtonFormField(
                                     hint: Text(_selectedCollegeDefault),
@@ -324,16 +327,25 @@ class _CommentPageState extends State<CommentPage> {
                                     onChanged: (value) {
                                       setState(() {
                                         _selectedCollege = value.toString();
-                                        _selectedDepartment =
-                                            _selectedDepartmentDefault;
+                                        _selectedDepartment = null;
                                       });
                                     },
+                                    label: const Text('學院'),
+                                    suffixIcon: _selectedCollege == null
+                                        ? null
+                                        : IconButton(
+                                            icon: const Icon(Icons.close),
+                                            tooltip: '取消選擇學院',
+                                            onPressed: () {
+                                              setState(() {
+                                                _selectedCollege = null;
+                                                _selectedDepartment = null;
+                                              });
+                                            },
+                                          ),
                                     items: () {
-                                      List<DropdownMenuItem<String>> items = [];
-                                      items.add(DropdownMenuItem(
-                                        value: _selectedCollegeDefault,
-                                        child: Text(_selectedCollegeDefault),
-                                      ));
+                                      List<DropdownMenuItem<String?>> items =
+                                          [];
                                       for (var key in departmentList.keys) {
                                         items.add(
                                           DropdownMenuItem(
@@ -347,16 +359,14 @@ class _CommentPageState extends State<CommentPage> {
                                   ),
                                   CustomDropdownButtonFormField(
                                     validator: (value) {
-                                      if (_selectedCollege !=
-                                              _selectedCollegeDefault &&
-                                          value == _selectedDepartmentDefault) {
+                                      if (_selectedCollege != null &&
+                                          value == null) {
                                         return '$_selectedDepartmentDefault或取消選擇學院';
                                       }
                                       return null;
                                     },
                                     hint: Text(_selectedDepartmentDefault),
-                                    value: _selectedCollege ==
-                                            _selectedCollegeDefault
+                                    value: _selectedCollege == null
                                         ? null
                                         : _selectedDepartment,
                                     onChanged: (value) {
@@ -364,20 +374,23 @@ class _CommentPageState extends State<CommentPage> {
                                         _selectedDepartment = value.toString();
                                       });
                                     },
-                                    items: _selectedCollege ==
-                                            _selectedCollegeDefault
+                                    label: const Text('系所/科目'),
+                                    suffixIcon: _selectedDepartment == null
+                                        ? null
+                                        : IconButton(
+                                            icon: const Icon(Icons.close),
+                                            tooltip: '取消選擇系所/科目',
+                                            onPressed: () {
+                                              setState(() {
+                                                _selectedDepartment = null;
+                                              });
+                                            },
+                                          ),
+                                    items: _selectedCollege == null
                                         ? null
                                         : () {
-                                            List<DropdownMenuItem<dynamic>>?
+                                            List<DropdownMenuItem<String?>>
                                                 items = [];
-                                            items.add(
-                                              DropdownMenuItem(
-                                                value:
-                                                    _selectedDepartmentDefault,
-                                                child: Text(
-                                                    _selectedDepartmentDefault),
-                                              ),
-                                            );
                                             var college = _selectedCollege;
                                             if (departmentList
                                                 .containsKey(college)) {
@@ -407,14 +420,20 @@ class _CommentPageState extends State<CommentPage> {
                                     _selectedSemester = value.toString();
                                   });
                                 },
+                                label: const Text('學期'),
+                                suffixIcon: _selectedSemester == null
+                                    ? null
+                                    : IconButton(
+                                        icon: const Icon(Icons.close),
+                                        tooltip: '取消選擇學期',
+                                        onPressed: () {
+                                          setState(() {
+                                            _selectedSemester = null;
+                                          });
+                                        },
+                                      ),
                                 items: () {
-                                  var items = <DropdownMenuItem<String>>[];
-                                  items.add(
-                                    DropdownMenuItem(
-                                      value: _selectedSemesterDefault,
-                                      child: Text(_selectedSemesterDefault),
-                                    ),
-                                  );
+                                  var items = <DropdownMenuItem<String?>>[];
                                   var nowYear = DateTime.now().year - 1911;
                                   for (var year = nowYear; year >= 99; year--) {
                                     items.add(
@@ -437,6 +456,8 @@ class _CommentPageState extends State<CommentPage> {
                                 height: 10,
                               ),
                               Wrap(
+                                spacing: 10,
+                                runSpacing: 10,
                                 children: [
                                   CustomDropdownButtonFormField(
                                     hint: Text(_selectedHardDefault),
@@ -446,12 +467,21 @@ class _CommentPageState extends State<CommentPage> {
                                         _selectedHard = value.toString();
                                       });
                                     },
+                                    label: const Text('難度'),
+                                    suffixIcon: _selectedHard == null
+                                        ? null
+                                        : IconButton(
+                                            icon: const Icon(Icons.close),
+                                            tooltip: '取消選擇難度',
+                                            onPressed: () {
+                                              setState(() {
+                                                _selectedHard = null;
+                                              });
+                                            },
+                                          ),
                                     items: () {
-                                      List<DropdownMenuItem<String>> items = [];
-                                      items.add(DropdownMenuItem(
-                                        value: _selectedHardDefault,
-                                        child: Text(_selectedHardDefault),
-                                      ));
+                                      List<DropdownMenuItem<String?>> items =
+                                          [];
                                       for (var hard in _hardList) {
                                         items.add(DropdownMenuItem(
                                           value: hard,
@@ -469,12 +499,21 @@ class _CommentPageState extends State<CommentPage> {
                                         _selectedRecommend = value.toString();
                                       });
                                     },
+                                    label: const Text('推薦度'),
+                                    suffixIcon: _selectedRecommend == null
+                                        ? null
+                                        : IconButton(
+                                            icon: const Icon(Icons.close),
+                                            tooltip: '取消選擇推薦度',
+                                            onPressed: () {
+                                              setState(() {
+                                                _selectedRecommend = null;
+                                              });
+                                            },
+                                          ),
                                     items: () {
-                                      List<DropdownMenuItem<String>> items = [];
-                                      items.add(DropdownMenuItem(
-                                        value: _selectedRecommendDefault,
-                                        child: Text(_selectedRecommendDefault),
-                                      ));
+                                      List<DropdownMenuItem<String?>> items =
+                                          [];
                                       for (var recommend in _recommendList) {
                                         items.add(DropdownMenuItem(
                                           value: recommend,
@@ -497,24 +536,12 @@ class _CommentPageState extends State<CommentPage> {
                                     _formKey.currentState!.save();
                                     search(
                                       null,
-                                      _selectedSemester ==
-                                              _selectedSemesterDefault
-                                          ? null
-                                          : _selectedSemester,
+                                      _selectedSemester,
                                       _selectedCourse,
-                                      _selectedDepartment ==
-                                                  _selectedDepartmentDefault ||
-                                              _selectedDepartment == ''
-                                          ? null
-                                          : _selectedDepartment,
+                                      _selectedDepartment,
                                       _selectedTeacher,
-                                      _selectedHard == _selectedHardDefault
-                                          ? null
-                                          : _selectedHard,
-                                      _selectedRecommend ==
-                                              _selectedRecommendDefault
-                                          ? null
-                                          : _selectedRecommend,
+                                      _selectedHard,
+                                      _selectedRecommend,
                                     );
                                   }
                                 },
