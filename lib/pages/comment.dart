@@ -123,33 +123,35 @@ class _CommentPageState extends State<CommentPage> {
 
   void getDepartments() async {
     var uri = Uri.parse('$baseURL/department');
-    http.get(uri).then((response) {
-      if (response.statusCode == 200) {
-        var data = jsonDecode(response.body);
-        if (data['code'] == 200) {
-          var result = data['result'];
-          for (var key in result) {
-            var college = key['college'];
-            List<String> depList = [];
-            for (var department in key['department']) {
-              depList.add(department['department']);
+    http.get(uri).then(
+      (response) {
+        if (response.statusCode == 200) {
+          var data = jsonDecode(response.body);
+          if (data['code'] == 200) {
+            var result = data['result'];
+            for (var key in result) {
+              var college = key['college'];
+              List<String> depList = [];
+              for (var department in key['department']) {
+                depList.add(department['department']);
+              }
+              setState(() {
+                departmentList[college] = depList;
+              });
             }
-            setState(() {
-              departmentList[college] = depList;
-            });
+            debugPrint('departmentList: ${departmentList.toString()}');
+          } else {
+            departmentList = {};
+            debugPrint(
+                '[ERROR] departmentList: ${response.statusCode} ${data['code']} ${data['msg']} ${response.body}');
           }
-          debugPrint('departmentList: ${departmentList.toString()}');
         } else {
           departmentList = {};
           debugPrint(
-              '[ERROR] departmentList: ${response.statusCode} ${data['code']} ${data['msg']} ${response.body}');
+              '[ERROR] departmentList: ${response.statusCode} ${response.body}');
         }
-      } else {
-        departmentList = {};
-        debugPrint(
-            '[ERROR] departmentList: ${response.statusCode} ${response.body}');
-      }
-    });
+      },
+    );
   }
 
   void search(String? token, String? year, String? course, String? department,
@@ -274,194 +276,93 @@ class _CommentPageState extends State<CommentPage> {
                               const SizedBox(
                                 height: 10,
                               ),
-                              CustomAutocomplete(
-                                optionsBuilder:
-                                    (TextEditingValue textEditingValue) {
-                                  if (textEditingValue.text == '') {
-                                    return const Iterable.empty();
-                                  }
-                                  return coursesList.where((String option) {
-                                    return option.contains(
-                                        textEditingValue.text.toUpperCase());
-                                  });
-                                },
-                                onSelected: (selection) {
-                                  debugPrint('selected $selection');
-                                  _selectedCourse = selection;
-                                },
-                                hintText: '請輸入課程名稱',
-                                labelText: '課程名稱',
-                                optionsMaxWidth:
-                                    MediaQuery.of(context).size.width * 0.9 <
-                                            400
-                                        ? MediaQuery.of(context).size.width *
-                                            0.9
-                                        : 400,
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              CustomAutocomplete(
-                                optionsBuilder:
-                                    (TextEditingValue textEditingValue) {
-                                  if (textEditingValue.text == '') {
-                                    return const Iterable.empty();
-                                  }
-                                  return teachersList.where((String option) {
-                                    return option.contains(
-                                        textEditingValue.text.toUpperCase());
-                                  });
-                                },
-                                onSelected: (selection) {
-                                  debugPrint('selected $selection');
-                                  _selectedTeacher = selection;
-                                },
-                                hintText: '請輸入教師姓名',
-                                labelText: '教師姓名',
-                                optionsMaxWidth:
-                                    MediaQuery.of(context).size.width * 0.9 <
-                                            400
-                                        ? MediaQuery.of(context).size.width *
-                                            0.9
-                                        : 400,
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
                               Wrap(
                                 spacing: 10,
                                 runSpacing: 10,
                                 children: [
-                                  CustomDropdownButtonFormField(
-                                    hint: Text(_selectedCollegeDefault),
-                                    value: _selectedCollege,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _selectedCollege = value.toString();
-                                        _selectedDepartment = null;
-                                      });
-                                    },
-                                    label: const Text('學院'),
-                                    suffixIcon: _selectedCollege == null
-                                        ? null
-                                        : IconButton(
-                                            icon: const Icon(Icons.close),
-                                            tooltip: '取消選擇學院',
-                                            onPressed: () {
-                                              setState(() {
-                                                _selectedCollege = null;
-                                                _selectedDepartment = null;
-                                              });
-                                            },
-                                          ),
-                                    items: () {
-                                      List<DropdownMenuItem<String?>> items =
-                                          [];
-                                      for (var key in departmentList.keys) {
-                                        items.add(
-                                          DropdownMenuItem(
-                                            value: key,
-                                            child: Text(key),
-                                          ),
-                                        );
-                                      }
-                                      return items;
-                                    }(),
+                                  SizedBox(
+                                    width: MediaQuery.of(context).size.width >
+                                            700
+                                        ? 325
+                                        : MediaQuery.of(context).size.width >
+                                                500
+                                            ? MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.5 -
+                                                25
+                                            : double.infinity,
+                                    child: CustomAutocomplete(
+                                      optionsBuilder:
+                                          (TextEditingValue textEditingValue) {
+                                        if (textEditingValue.text == '') {
+                                          return const Iterable.empty();
+                                        }
+                                        return coursesList
+                                            .where((String option) {
+                                          return option.contains(
+                                            textEditingValue.text.toUpperCase(),
+                                          );
+                                        });
+                                      },
+                                      onSelected: (selection) {
+                                        debugPrint('selected $selection');
+                                        _selectedCourse = selection;
+                                      },
+                                      hintText: '請輸入課程名稱',
+                                      labelText: '課程名稱',
+                                      optionsMaxWidth: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.9 <
+                                              400
+                                          ? MediaQuery.of(context).size.width *
+                                              0.9
+                                          : 400,
+                                    ),
                                   ),
-                                  CustomDropdownButtonFormField(
-                                    validator: (value) {
-                                      if (_selectedCollege != null &&
-                                          value == null) {
-                                        return '$_selectedDepartmentDefault或取消選擇學院';
-                                      }
-                                      return null;
-                                    },
-                                    hint: Text(_selectedDepartmentDefault),
-                                    value: _selectedCollege == null
-                                        ? null
-                                        : _selectedDepartment,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _selectedDepartment = value.toString();
-                                      });
-                                    },
-                                    label: const Text('系所/科目'),
-                                    suffixIcon: _selectedDepartment == null
-                                        ? null
-                                        : IconButton(
-                                            icon: const Icon(Icons.close),
-                                            tooltip: '取消選擇系所/科目',
-                                            onPressed: () {
-                                              setState(() {
-                                                _selectedDepartment = null;
-                                              });
-                                            },
-                                          ),
-                                    items: _selectedCollege == null
-                                        ? null
-                                        : () {
-                                            List<DropdownMenuItem<String?>>
-                                                items = [];
-                                            var college = _selectedCollege;
-                                            if (departmentList
-                                                .containsKey(college)) {
-                                              for (var department
-                                                  in departmentList[college]!) {
-                                                items.add(
-                                                  DropdownMenuItem(
-                                                    value: department,
-                                                    child: Text(department),
-                                                  ),
-                                                );
-                                              }
-                                            }
-                                            return items;
-                                          }(),
+                                  SizedBox(
+                                    width: MediaQuery.of(context).size.width >
+                                            700
+                                        ? 325
+                                        : MediaQuery.of(context).size.width >
+                                                500
+                                            ? MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.5 -
+                                                25
+                                            : double.infinity,
+                                    child: CustomAutocomplete(
+                                      optionsBuilder:
+                                          (TextEditingValue textEditingValue) {
+                                        if (textEditingValue.text == '') {
+                                          return const Iterable.empty();
+                                        }
+                                        return teachersList
+                                            .where((String option) {
+                                          return option.contains(
+                                              textEditingValue.text
+                                                  .toUpperCase());
+                                        });
+                                      },
+                                      onSelected: (selection) {
+                                        debugPrint('selected $selection');
+                                        _selectedTeacher = selection;
+                                      },
+                                      hintText: '請輸入教師姓名',
+                                      labelText: '教師姓名',
+                                      optionsMaxWidth: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.9 <
+                                              400
+                                          ? MediaQuery.of(context).size.width *
+                                              0.9
+                                          : 400,
+                                    ),
                                   ),
                                 ],
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              CustomDropdownButtonFormField(
-                                hint: Text(_selectedSemesterDefault),
-                                value: _selectedSemester,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _selectedSemester = value.toString();
-                                  });
-                                },
-                                label: const Text('學期'),
-                                suffixIcon: _selectedSemester == null
-                                    ? null
-                                    : IconButton(
-                                        icon: const Icon(Icons.close),
-                                        tooltip: '取消選擇學期',
-                                        onPressed: () {
-                                          setState(() {
-                                            _selectedSemester = null;
-                                          });
-                                        },
-                                      ),
-                                items: () {
-                                  var items = <DropdownMenuItem<String?>>[];
-                                  var nowYear = DateTime.now().year - 1911;
-                                  for (var year = nowYear; year >= 99; year--) {
-                                    items.add(
-                                      DropdownMenuItem(
-                                        value: '$year-2',
-                                        child: Text('$year-2'),
-                                      ),
-                                    );
-                                    items.add(
-                                      DropdownMenuItem(
-                                        value: '$year-1',
-                                        child: Text('$year-1'),
-                                      ),
-                                    );
-                                  }
-                                  return items;
-                                }(),
                               ),
                               const SizedBox(
                                 height: 10,
@@ -472,11 +373,189 @@ class _CommentPageState extends State<CommentPage> {
                                 children: [
                                   SizedBox(
                                     width: MediaQuery.of(context).size.width >
-                                            600
-                                        ? double.infinity
-                                        : MediaQuery.of(context).size.width *
-                                                0.5 -
-                                            25,
+                                            700
+                                        ? 325
+                                        : MediaQuery.of(context).size.width >
+                                                500
+                                            ? MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.5 -
+                                                25
+                                            : double.infinity,
+                                    child: CustomDropdownButtonFormField(
+                                      hint: Text(_selectedCollegeDefault),
+                                      value: _selectedCollege,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _selectedCollege = value.toString();
+                                          _selectedDepartment = null;
+                                        });
+                                      },
+                                      label: const Text('學院'),
+                                      suffixIcon: _selectedCollege == null
+                                          ? null
+                                          : IconButton(
+                                              icon: const Icon(Icons.close),
+                                              tooltip: '取消選擇學院',
+                                              onPressed: () {
+                                                setState(() {
+                                                  _selectedCollege = null;
+                                                  _selectedDepartment = null;
+                                                });
+                                              },
+                                            ),
+                                      items: () {
+                                        List<DropdownMenuItem<String?>> items =
+                                            [];
+                                        for (var key in departmentList.keys) {
+                                          items.add(
+                                            DropdownMenuItem(
+                                              value: key,
+                                              child: Text(key),
+                                            ),
+                                          );
+                                        }
+                                        return items;
+                                      }(),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: MediaQuery.of(context).size.width >
+                                            700
+                                        ? 325
+                                        : MediaQuery.of(context).size.width >
+                                                500
+                                            ? MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.5 -
+                                                25
+                                            : double.infinity,
+                                    child: CustomDropdownButtonFormField(
+                                      validator: (value) {
+                                        if (_selectedCollege != null &&
+                                            value == null) {
+                                          return '$_selectedDepartmentDefault或取消選擇學院';
+                                        }
+                                        return null;
+                                      },
+                                      hint: Text(_selectedDepartmentDefault),
+                                      value: _selectedCollege == null
+                                          ? null
+                                          : _selectedDepartment,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _selectedDepartment =
+                                              value.toString();
+                                        });
+                                      },
+                                      label: const Text('系所/科目'),
+                                      suffixIcon: _selectedDepartment == null
+                                          ? null
+                                          : IconButton(
+                                              icon: const Icon(Icons.close),
+                                              tooltip: '取消選擇系所/科目',
+                                              onPressed: () {
+                                                setState(() {
+                                                  _selectedDepartment = null;
+                                                });
+                                              },
+                                            ),
+                                      items: _selectedCollege == null
+                                          ? null
+                                          : () {
+                                              List<DropdownMenuItem<String?>>
+                                                  items = [];
+                                              var college = _selectedCollege;
+                                              if (departmentList
+                                                  .containsKey(college)) {
+                                                for (var department
+                                                    in departmentList[
+                                                        college]!) {
+                                                  items.add(
+                                                    DropdownMenuItem(
+                                                      value: department,
+                                                      child: Text(department),
+                                                    ),
+                                                  );
+                                                }
+                                              }
+                                              return items;
+                                            }(),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Wrap(
+                                spacing: 10,
+                                runSpacing: 10,
+                                children: [
+                                  SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width > 700
+                                            ? 210
+                                            : double.infinity,
+                                    child: CustomDropdownButtonFormField(
+                                      hint: Text(_selectedSemesterDefault),
+                                      value: _selectedSemester,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _selectedSemester = value.toString();
+                                        });
+                                      },
+                                      label: const Text('學期'),
+                                      suffixIcon: _selectedSemester == null
+                                          ? null
+                                          : IconButton(
+                                              icon: const Icon(Icons.close),
+                                              tooltip: '取消選擇學期',
+                                              onPressed: () {
+                                                setState(() {
+                                                  _selectedSemester = null;
+                                                });
+                                              },
+                                            ),
+                                      items: () {
+                                        var items =
+                                            <DropdownMenuItem<String?>>[];
+                                        var nowYear =
+                                            DateTime.now().year - 1911;
+                                        for (var year = nowYear;
+                                            year >= 99;
+                                            year--) {
+                                          items.add(
+                                            DropdownMenuItem(
+                                              value: '$year-2',
+                                              child: Text('$year-2'),
+                                            ),
+                                          );
+                                          items.add(
+                                            DropdownMenuItem(
+                                              value: '$year-1',
+                                              child: Text('$year-1'),
+                                            ),
+                                          );
+                                        }
+                                        return items;
+                                      }(),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: MediaQuery.of(context).size.width >
+                                            700
+                                        ? 215
+                                        : MediaQuery.of(context).size.width <
+                                                400
+                                            ? double.infinity
+                                            : MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.5 -
+                                                25,
                                     child: CustomDropdownButtonFormField(
                                       hint: Text(_selectedHardDefault),
                                       value: _selectedHard,
@@ -512,11 +591,16 @@ class _CommentPageState extends State<CommentPage> {
                                   ),
                                   SizedBox(
                                     width: MediaQuery.of(context).size.width >
-                                            600
-                                        ? double.infinity
-                                        : MediaQuery.of(context).size.width *
-                                                0.5 -
-                                            25,
+                                            700
+                                        ? 215
+                                        : MediaQuery.of(context).size.width <
+                                                400
+                                            ? double.infinity
+                                            : MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.5 -
+                                                25,
                                     child: CustomDropdownButtonFormField(
                                       hint: Text(_selectedRecommendDefault),
                                       value: _selectedRecommend,

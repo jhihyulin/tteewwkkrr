@@ -73,6 +73,7 @@ class _CustomAutocomplete extends State<CustomAutocomplete> {
           FocusNode focusNode,
           VoidCallback onFieldSubmitted) {
         return CustomTextField(
+          maxLines: 1,
           controller: textEditingController,
           focusNode: focusNode,
           hintText: widget.hintText,
