@@ -34,6 +34,7 @@ class _CommentPageState extends State<CommentPage> {
   late String? _selectedSemester;
   late String? _selectedHard;
   late String? _selectedRecommend;
+  late ExpansionTileController _expansionTileController;
   final List<String> _recommendList = [
     '非常不推薦',
     '不推薦',
@@ -65,6 +66,7 @@ class _CommentPageState extends State<CommentPage> {
     _selectedRecommend = null;
     _searchResult = null;
     _isSearching = false;
+    _expansionTileController = ExpansionTileController();
     getCourses();
     getTeachers();
     getDepartments();
@@ -203,6 +205,7 @@ class _CommentPageState extends State<CommentPage> {
           setState(() {
             _searchResult = result;
           });
+          _expansionTileController.collapse();
           // debugPrint('search: ${result.toString()}');
         } else {
           debugPrint(
@@ -227,6 +230,13 @@ class _CommentPageState extends State<CommentPage> {
     return false;
   }
 
+  void clearSearch() {
+    setState(() {
+      _searchResult = null;
+    });
+    _expansionTileController.expand();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -249,6 +259,7 @@ class _CommentPageState extends State<CommentPage> {
               children: [
                 CustomCard(
                   child: CustomExpansionTile(
+                    controller: _expansionTileController,
                     title: const Text('搜尋'),
                     subtitle: const Text('想以什麼條件搜尋？'),
                     leading: const Icon(Icons.search),
@@ -459,69 +470,85 @@ class _CommentPageState extends State<CommentPage> {
                                 spacing: 10,
                                 runSpacing: 10,
                                 children: [
-                                  CustomDropdownButtonFormField(
-                                    hint: Text(_selectedHardDefault),
-                                    value: _selectedHard,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _selectedHard = value.toString();
-                                      });
-                                    },
-                                    label: const Text('難度'),
-                                    suffixIcon: _selectedHard == null
-                                        ? null
-                                        : IconButton(
-                                            icon: const Icon(Icons.close),
-                                            tooltip: '取消選擇難度',
-                                            onPressed: () {
-                                              setState(() {
-                                                _selectedHard = null;
-                                              });
-                                            },
-                                          ),
-                                    items: () {
-                                      List<DropdownMenuItem<String?>> items =
-                                          [];
-                                      for (var hard in _hardList) {
-                                        items.add(DropdownMenuItem(
-                                          value: hard,
-                                          child: Text(hard),
-                                        ));
-                                      }
-                                      return items;
-                                    }(),
+                                  SizedBox(
+                                    width: MediaQuery.of(context).size.width >
+                                            600
+                                        ? double.infinity
+                                        : MediaQuery.of(context).size.width *
+                                                0.5 -
+                                            25,
+                                    child: CustomDropdownButtonFormField(
+                                      hint: Text(_selectedHardDefault),
+                                      value: _selectedHard,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _selectedHard = value.toString();
+                                        });
+                                      },
+                                      label: const Text('難度'),
+                                      suffixIcon: _selectedHard == null
+                                          ? null
+                                          : IconButton(
+                                              icon: const Icon(Icons.close),
+                                              tooltip: '取消選擇難度',
+                                              onPressed: () {
+                                                setState(() {
+                                                  _selectedHard = null;
+                                                });
+                                              },
+                                            ),
+                                      items: () {
+                                        List<DropdownMenuItem<String?>> items =
+                                            [];
+                                        for (var hard in _hardList) {
+                                          items.add(DropdownMenuItem(
+                                            value: hard,
+                                            child: Text(hard),
+                                          ));
+                                        }
+                                        return items;
+                                      }(),
+                                    ),
                                   ),
-                                  CustomDropdownButtonFormField(
-                                    hint: Text(_selectedRecommendDefault),
-                                    value: _selectedRecommend,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _selectedRecommend = value.toString();
-                                      });
-                                    },
-                                    label: const Text('推薦度'),
-                                    suffixIcon: _selectedRecommend == null
-                                        ? null
-                                        : IconButton(
-                                            icon: const Icon(Icons.close),
-                                            tooltip: '取消選擇推薦度',
-                                            onPressed: () {
-                                              setState(() {
-                                                _selectedRecommend = null;
-                                              });
-                                            },
-                                          ),
-                                    items: () {
-                                      List<DropdownMenuItem<String?>> items =
-                                          [];
-                                      for (var recommend in _recommendList) {
-                                        items.add(DropdownMenuItem(
-                                          value: recommend,
-                                          child: Text(recommend),
-                                        ));
-                                      }
-                                      return items;
-                                    }(),
+                                  SizedBox(
+                                    width: MediaQuery.of(context).size.width >
+                                            600
+                                        ? double.infinity
+                                        : MediaQuery.of(context).size.width *
+                                                0.5 -
+                                            25,
+                                    child: CustomDropdownButtonFormField(
+                                      hint: Text(_selectedRecommendDefault),
+                                      value: _selectedRecommend,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _selectedRecommend = value.toString();
+                                        });
+                                      },
+                                      label: const Text('推薦度'),
+                                      suffixIcon: _selectedRecommend == null
+                                          ? null
+                                          : IconButton(
+                                              icon: const Icon(Icons.close),
+                                              tooltip: '取消選擇推薦度',
+                                              onPressed: () {
+                                                setState(() {
+                                                  _selectedRecommend = null;
+                                                });
+                                              },
+                                            ),
+                                      items: () {
+                                        List<DropdownMenuItem<String?>> items =
+                                            [];
+                                        for (var recommend in _recommendList) {
+                                          items.add(DropdownMenuItem(
+                                            value: recommend,
+                                            child: Text(recommend),
+                                          ));
+                                        }
+                                        return items;
+                                      }(),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -572,9 +599,7 @@ class _CommentPageState extends State<CommentPage> {
                             icon: const Icon(Icons.close),
                             tooltip: '清除搜尋結果',
                             onPressed: () {
-                              setState(() {
-                                _searchResult = null;
-                              });
+                              clearSearch();
                             },
                           ),
                         ),
