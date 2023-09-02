@@ -1016,6 +1016,8 @@ class _CommentPageState extends State<CommentPage> {
                       CustomCard(
                         child: ListTile(
                           title: const Text('搜尋結果'),
+                          subtitle: Text(
+                              '${_searchResult!.length}筆搜尋結果${_searchResult!.length > _maximumRead ? '，僅顯示前$_maximumRead筆' : ''}'),
                           leading: const Icon(Icons.search),
                           trailing: IconButton(
                             icon: const Icon(Icons.close),
