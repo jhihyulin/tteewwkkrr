@@ -36,6 +36,7 @@ class _CommentPageState extends State<CommentPage> {
   late String? _selectedHard;
   late String? _selectedRecommend;
   late ExpansionTileController _expansionTileController;
+  final _maximumRead = 100;
   final List<String> _recommendList = [
     '非常不推薦',
     '不推薦',
@@ -293,22 +294,155 @@ class _CommentPageState extends State<CommentPage> {
     _expansionTileController.expand();
   }
 
-  Widget colorBall(String grad) {
+  Widget colorBall(String grad, bool reverse) {
     return Container(
       width: 20,
       height: 20,
       decoration: BoxDecoration(
         color: grad == 'E'
-            ? Colors.red
+            ? reverse
+                ? Colors.green
+                : Colors.red
             : grad == 'D'
-                ? Colors.orange
+                ? reverse
+                    ? Colors.blue
+                    : Colors.orange
                 : grad == 'C'
-                    ? Colors.yellow
+                    ? reverse
+                        ? Colors.yellow
+                        : Colors.yellow
                     : grad == 'B'
-                        ? Colors.blue
-                        : Colors.green,
+                        ? reverse
+                            ? Colors.orange
+                            : Colors.blue
+                        : reverse
+                            ? Colors.red
+                            : Colors.green,
         shape: BoxShape.circle,
       ),
+    );
+  }
+
+  Widget doubleColorBall(String grad1, String grad2) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // 使用圓點顏色紅到綠來表示推薦度及難度
+        IconButton(
+          icon: colorBall(grad1, false),
+          tooltip: grad1 == 'E'
+              ? _recommendList[0]
+              : grad1 == 'D'
+                  ? _recommendList[1]
+                  : grad1 == 'C'
+                      ? '${_recommendList[2]}(推薦度)'
+                      : grad1 == 'B'
+                          ? _recommendList[3]
+                          : _recommendList[4],
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text('推薦度'),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      for (var i = 0; i < _recommendList.length; i++)
+                        Row(
+                          children: [
+                            colorBall(
+                                i == 0
+                                    ? 'E'
+                                    : i == 1
+                                        ? 'D'
+                                        : i == 2
+                                            ? 'C'
+                                            : i == 3
+                                                ? 'B'
+                                                : 'A',
+                                false),
+                            const SizedBox(
+                              width: 5,
+                            ),
+                            Text(
+                              _recommendList[i],
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('關閉'),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        ),
+        IconButton(
+          icon: colorBall(grad2, true),
+          tooltip: grad2 == 'E'
+              ? _hardList[0]
+              : grad2 == 'D'
+                  ? _hardList[1]
+                  : grad2 == 'C'
+                      ? '${_hardList[2]}(難度)'
+                      : grad2 == 'B'
+                          ? _hardList[3]
+                          : _hardList[4],
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text('難度'),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      for (var i = 0; i < _hardList.length; i++)
+                        Row(
+                          children: [
+                            colorBall(
+                                i == 0
+                                    ? 'E'
+                                    : i == 1
+                                        ? 'D'
+                                        : i == 2
+                                            ? 'C'
+                                            : i == 3
+                                                ? 'B'
+                                                : 'A',
+                                true),
+                            const SizedBox(
+                              width: 5,
+                            ),
+                            Text(
+                              _hardList[i],
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('關閉'),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        ),
+      ],
     );
   }
 
@@ -750,6 +884,132 @@ class _CommentPageState extends State<CommentPage> {
                     padding: const EdgeInsets.all(4),
                     child: const CustomLinearProgressIndicator(),
                   ),
+                // 統計平均數值
+                if (_searchResult != null && _searchResult!.isNotEmpty)
+                  CustomCard(
+                    child: Builder(
+                      builder: (context) {
+                        List recommend = [];
+                        List hard = [];
+                        for (var i in _searchResult!.take(_maximumRead)) {
+                          if (i['ad'] == 0) {
+                            recommend.add(i['recommend']);
+                            hard.add(i['hard']);
+                          }
+                        }
+                        var recommendSum = 0;
+                        var hardSum = 0;
+                        for (var i in recommend) {
+                          recommendSum += i == 'E'
+                              ? 1
+                              : i == 'D'
+                                  ? 2
+                                  : i == 'C'
+                                      ? 3
+                                      : i == 'B'
+                                          ? 4
+                                          : 5;
+                        }
+                        for (var i in hard) {
+                          hardSum += i == 'E'
+                              ? 1
+                              : i == 'D'
+                                  ? 2
+                                  : i == 'C'
+                                      ? 3
+                                      : i == 'B'
+                                          ? 4
+                                          : 5;
+                        }
+                        var recommendAvg = recommendSum / recommend.length;
+                        var hardAvg = hardSum / hard.length;
+                        return CustomExpansionTile(
+                            title: const Text('統計'),
+                            subtitle: const Text('平均數值'),
+                            leading: const Icon(Icons.bar_chart),
+                            initiallyExpanded: false,
+                            trailing: doubleColorBall(
+                              recommendAvg > 4.5
+                                  ? 'A'
+                                  : recommendAvg > 3.5
+                                      ? 'B'
+                                      : recommendAvg > 2.5
+                                          ? 'C'
+                                          : recommendAvg > 1.5
+                                              ? 'D'
+                                              : 'E',
+                              hardAvg > 4.5
+                                  ? 'A'
+                                  : hardAvg > 3.5
+                                      ? 'B'
+                                      : hardAvg > 2.5
+                                          ? 'C'
+                                          : hardAvg > 1.5
+                                              ? 'D'
+                                              : 'E',
+                            ),
+                            // 表格 縱向分別是難度及推薦度，橫向分別是五級顏色的球，顏色由紅到綠，內度數值為該顏色(等級)的數量
+                            children: [
+                              Table(
+                                children: [
+                                  TableRow(
+                                    children: [
+                                      const Text(
+                                        '數量',
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      for (var i = 'A';
+                                          i != 'F';
+                                          i = String.fromCharCode(
+                                              i.codeUnitAt(0) + 1))
+                                        colorBall(i, false),
+                                    ],
+                                  ),
+                                  TableRow(
+                                    children: [
+                                      const Text(
+                                        '推薦度',
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      for (var i = 'A';
+                                          i != 'F';
+                                          i = String.fromCharCode(
+                                              i.codeUnitAt(0) + 1))
+                                        Text(
+                                          recommend
+                                              .where((element) => element == i)
+                                              .length
+                                              .toString(),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                    ],
+                                  ),
+                                  TableRow(
+                                    children: [
+                                      const Text(
+                                        '難度',
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      for (var i = 'E';
+                                          i !=
+                                              '@'; // utf16下 A的前一個字元 0041 -> 0040
+                                          i = String.fromCharCode(
+                                              i.codeUnitAt(0) - 1))
+                                        Text(
+                                          hard
+                                              .where((element) => element == i)
+                                              .length
+                                              .toString(),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                    ],
+                                  ),
+                                ],
+                              )
+                            ]);
+                      },
+                    ),
+                  ),
                 Wrap(
                   children: [
                     if (_searchResult != null)
@@ -767,7 +1027,7 @@ class _CommentPageState extends State<CommentPage> {
                         ),
                       ),
                     if (_searchResult != null)
-                      for (var i in _searchResult!.take(100))
+                      for (var i in _searchResult!.take(_maximumRead))
                         // 先略過所有的廣告 TODO: 顯示廣告
                         if (i['ad'] == 0)
                           CustomCard(
@@ -775,125 +1035,9 @@ class _CommentPageState extends State<CommentPage> {
                               title: Text('${i['course']}'),
                               subtitle: Text('${i['teacher']}'),
                               initiallyExpanded: !isSpam(i['comment']),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  // 使用圓點顏色紅到綠來表示推薦度及難度
-                                  IconButton(
-                                    icon: colorBall(i['recommend']),
-                                    tooltip: i['recommend'] == 'E'
-                                        ? _recommendList[0]
-                                        : i['recommend'] == 'D'
-                                            ? _recommendList[1]
-                                            : i['recommend'] == 'C'
-                                                ? '${_recommendList[2]}(推薦度)'
-                                                : i['recommend'] == 'B'
-                                                    ? _recommendList[3]
-                                                    : _recommendList[4],
-                                    onPressed: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) {
-                                          return AlertDialog(
-                                            title: const Text('推薦度'),
-                                            content: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                for (var i = 0;
-                                                    i < _recommendList.length;
-                                                    i++)
-                                                  Row(
-                                                    children: [
-                                                      colorBall(i == 0
-                                                          ? 'E'
-                                                          : i == 1
-                                                              ? 'D'
-                                                              : i == 2
-                                                                  ? 'C'
-                                                                  : i == 3
-                                                                      ? 'B'
-                                                                      : 'A'),
-                                                      const SizedBox(
-                                                        width: 5,
-                                                      ),
-                                                      Text(
-                                                        _recommendList[i],
-                                                      ),
-                                                    ],
-                                                  ),
-                                              ],
-                                            ),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: const Text('關閉'),
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      );
-                                    },
-                                  ),
-                                  IconButton(
-                                    icon: colorBall(i['hard']),
-                                    tooltip: i['hard'] == 'E'
-                                        ? _hardList[0]
-                                        : i['hard'] == 'D'
-                                            ? _hardList[1]
-                                            : i['hard'] == 'C'
-                                                ? '${_hardList[2]}(難度)'
-                                                : i['hard'] == 'B'
-                                                    ? _hardList[3]
-                                                    : _hardList[4],
-                                    onPressed: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) {
-                                          return AlertDialog(
-                                            title: const Text('難度'),
-                                            content: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                for (var i = 0;
-                                                    i < _hardList.length;
-                                                    i++)
-                                                  Row(
-                                                    children: [
-                                                      colorBall(i == 0
-                                                          ? 'E'
-                                                          : i == 1
-                                                              ? 'D'
-                                                              : i == 2
-                                                                  ? 'C'
-                                                                  : i == 3
-                                                                      ? 'B'
-                                                                      : 'A'),
-                                                      const SizedBox(
-                                                        width: 5,
-                                                      ),
-                                                      Text(
-                                                        _hardList[i],
-                                                      ),
-                                                    ],
-                                                  ),
-                                              ],
-                                            ),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: const Text('關閉'),
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                      );
-                                    },
-                                  ),
-                                ],
+                              trailing: doubleColorBall(
+                                i['recommend'],
+                                i['hard'],
                               ),
                               children: [
                                 Container(
