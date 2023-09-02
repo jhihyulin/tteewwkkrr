@@ -2,11 +2,12 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:tteewwkkrr/widget/drop_down_button_form_field.dart';
 
 import '../widget/card.dart';
 import '../widget/expansion_tile.dart';
 import '../widget/linear_progress_indicator.dart';
-import '../widget/autocomplete.dart';
+import '../widget/auto_complete.dart';
 
 class CommentPage extends StatefulWidget {
   const CommentPage({Key? key}) : super(key: key);
@@ -317,12 +318,14 @@ class _CommentPageState extends State<CommentPage> {
                               ),
                               Wrap(
                                 children: [
-                                  DropdownButton(
+                                  CustomDropdownButtonFormField(
                                     hint: Text(_selectedCollegeDefault),
                                     value: _selectedCollege,
                                     onChanged: (value) {
                                       setState(() {
                                         _selectedCollege = value.toString();
+                                        _selectedDepartment =
+                                            _selectedDepartmentDefault;
                                       });
                                     },
                                     items: () {
@@ -342,7 +345,7 @@ class _CommentPageState extends State<CommentPage> {
                                       return items;
                                     }(),
                                   ),
-                                  DropdownButtonFormField(
+                                  CustomDropdownButtonFormField(
                                     validator: (value) {
                                       if (_selectedCollege !=
                                               _selectedCollegeDefault &&
@@ -365,13 +368,16 @@ class _CommentPageState extends State<CommentPage> {
                                             _selectedCollegeDefault
                                         ? null
                                         : () {
-                                            List<DropdownMenuItem<String>>
+                                            List<DropdownMenuItem<dynamic>>?
                                                 items = [];
-                                            items.add(DropdownMenuItem(
-                                              value: _selectedDepartmentDefault,
-                                              child: Text(
-                                                  _selectedDepartmentDefault),
-                                            ));
+                                            items.add(
+                                              DropdownMenuItem(
+                                                value:
+                                                    _selectedDepartmentDefault,
+                                                child: Text(
+                                                    _selectedDepartmentDefault),
+                                              ),
+                                            );
                                             var college = _selectedCollege;
                                             if (departmentList
                                                 .containsKey(college)) {
@@ -393,7 +399,7 @@ class _CommentPageState extends State<CommentPage> {
                               const SizedBox(
                                 height: 10,
                               ),
-                              DropdownButton(
+                              CustomDropdownButtonFormField(
                                 hint: Text(_selectedSemesterDefault),
                                 value: _selectedSemester,
                                 onChanged: (value) {
@@ -432,7 +438,7 @@ class _CommentPageState extends State<CommentPage> {
                               ),
                               Wrap(
                                 children: [
-                                  DropdownButton(
+                                  CustomDropdownButtonFormField(
                                     hint: Text(_selectedHardDefault),
                                     value: _selectedHard,
                                     onChanged: (value) {
@@ -455,7 +461,7 @@ class _CommentPageState extends State<CommentPage> {
                                       return items;
                                     }(),
                                   ),
-                                  DropdownButton(
+                                  CustomDropdownButtonFormField(
                                     hint: Text(_selectedRecommendDefault),
                                     value: _selectedRecommend,
                                     onChanged: (value) {
@@ -592,7 +598,11 @@ class _CommentPageState extends State<CommentPage> {
                             ),
                           ),
                     if (_searchResult != null && _searchResult!.isEmpty)
-                      const Text('沒有搜尋結果'),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        alignment: Alignment.center,
+                        child: const Text('沒有搜尋結果'),
+                      ),
                   ],
                 )
               ],
