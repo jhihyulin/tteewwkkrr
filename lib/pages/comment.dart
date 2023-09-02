@@ -1043,7 +1043,8 @@ class _CommentPageState extends State<CommentPage> {
                               ),
                               children: [
                                 Container(
-                                  padding: const EdgeInsets.all(16),
+                                  padding:
+                                      const EdgeInsets.fromLTRB(16, 0, 16, 0),
                                   width: double.infinity,
                                   child: Column(
                                     children: [
@@ -1056,6 +1057,15 @@ class _CommentPageState extends State<CommentPage> {
                                       ),
                                     ],
                                   ), //
+                                ),
+                                Container(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                                  width: double.infinity,
+                                  child: Text(
+                                    '${i['department']} ${i['year'].length == 4 ? '1${i['year']}' : '9${i['year']}'}',
+                                    textAlign: TextAlign.right,
+                                  ),
                                 ),
                               ],
                             ),
