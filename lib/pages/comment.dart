@@ -293,6 +293,25 @@ class _CommentPageState extends State<CommentPage> {
     _expansionTileController.expand();
   }
 
+  Widget colorBall(String grad) {
+    return Container(
+      width: 20,
+      height: 20,
+      decoration: BoxDecoration(
+        color: grad == 'E'
+            ? Colors.red
+            : grad == 'D'
+                ? Colors.orange
+                : grad == 'C'
+                    ? Colors.yellow
+                    : grad == 'B'
+                        ? Colors.blue
+                        : Colors.green,
+        shape: BoxShape.circle,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -756,6 +775,126 @@ class _CommentPageState extends State<CommentPage> {
                               title: Text('${i['course']}'),
                               subtitle: Text('${i['teacher']}'),
                               initiallyExpanded: !isSpam(i['comment']),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  // 使用圓點顏色紅到綠來表示推薦度及難度
+                                  IconButton(
+                                    icon: colorBall(i['recommend']),
+                                    tooltip: i['recommend'] == 'E'
+                                        ? _recommendList[0]
+                                        : i['recommend'] == 'D'
+                                            ? _recommendList[1]
+                                            : i['recommend'] == 'C'
+                                                ? '${_recommendList[2]}(推薦度)'
+                                                : i['recommend'] == 'B'
+                                                    ? _recommendList[3]
+                                                    : _recommendList[4],
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            title: const Text('推薦度'),
+                                            content: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                for (var i = 0;
+                                                    i < _recommendList.length;
+                                                    i++)
+                                                  Row(
+                                                    children: [
+                                                      colorBall(i == 0
+                                                          ? 'E'
+                                                          : i == 1
+                                                              ? 'D'
+                                                              : i == 2
+                                                                  ? 'C'
+                                                                  : i == 3
+                                                                      ? 'B'
+                                                                      : 'A'),
+                                                      const SizedBox(
+                                                        width: 5,
+                                                      ),
+                                                      Text(
+                                                        _recommendList[i],
+                                                      ),
+                                                    ],
+                                                  ),
+                                              ],
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text('關閉'),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: colorBall(i['hard']),
+                                    tooltip: i['hard'] == 'E'
+                                        ? _hardList[0]
+                                        : i['hard'] == 'D'
+                                            ? _hardList[1]
+                                            : i['hard'] == 'C'
+                                                ? '${_hardList[2]}(難度)'
+                                                : i['hard'] == 'B'
+                                                    ? _hardList[3]
+                                                    : _hardList[4],
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            title: const Text('難度'),
+                                            content: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                for (var i = 0;
+                                                    i < _hardList.length;
+                                                    i++)
+                                                  Row(
+                                                    children: [
+                                                      colorBall(i == 0
+                                                          ? 'E'
+                                                          : i == 1
+                                                              ? 'D'
+                                                              : i == 2
+                                                                  ? 'C'
+                                                                  : i == 3
+                                                                      ? 'B'
+                                                                      : 'A'),
+                                                      const SizedBox(
+                                                        width: 5,
+                                                      ),
+                                                      Text(
+                                                        _hardList[i],
+                                                      ),
+                                                    ],
+                                                  ),
+                                              ],
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text('關閉'),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
                               children: [
                                 Container(
                                   padding: const EdgeInsets.all(16),
@@ -767,23 +906,6 @@ class _CommentPageState extends State<CommentPage> {
                                         child: Text(
                                           '${i['comment']}',
                                           textAlign: TextAlign.left,
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                      SizedBox(
-                                        width: double.infinity,
-                                        child: Text(
-                                          '${i['hard'] == 'E' ? _hardList[0] : i['hard'] == 'D' ? _hardList[1] : i['hard'] == 'C' ? _hardList[2] : i['hard'] == 'B' ? _hardList[3] : _hardList[4]} ${i['recommend'] == 'E' ? _recommendList[0] : i['recommend'] == 'D' ? _recommendList[1] : i['recommend'] == 'C' ? _recommendList[2] : i['recommend'] == 'B' ? _recommendList[3] : _recommendList[4]}',
-                                          textAlign: TextAlign.left,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: double.infinity,
-                                        child: Text(
-                                          '${i['department']} ${i['year'].length == 4 ? '1${i['year']}' : '9${i['year']}'}',
-                                          textAlign: TextAlign.right,
                                         ),
                                       ),
                                     ],
