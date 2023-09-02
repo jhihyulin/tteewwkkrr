@@ -8,6 +8,7 @@ import '../widget/expansion_tile.dart';
 import '../widget/linear_progress_indicator.dart';
 import '../widget/auto_complete.dart';
 import '../widget/drop_down_button_form_field.dart';
+import '../widget/scaffold_messenger.dart';
 
 class CommentPage extends StatefulWidget {
   const CommentPage({Key? key}) : super(key: key);
@@ -87,12 +88,20 @@ class _CommentPageState extends State<CommentPage> {
         } else {
           coursesList = [];
           debugPrint(
-              '[ERROR] courseList: ${response.statusCode} ${response.body}');
+              '[ERROR] courseList: ${response.statusCode} ${data['code']} ${response.body}');
+          CustomScaffoldMessenger.showErrorMessageSnackBar(
+            context,
+            '${response.statusCode} ${data['code']} 課程列表載入失敗',
+          );
         }
       } else {
         coursesList = [];
         debugPrint(
             '[ERROR] courseList: ${response.statusCode} ${response.body}');
+        CustomScaffoldMessenger.showErrorMessageSnackBar(
+          context,
+          '${response.statusCode} 課程列表載入失敗',
+        );
       }
     });
   }
@@ -112,11 +121,19 @@ class _CommentPageState extends State<CommentPage> {
           teachersList = [];
           debugPrint(
               '[ERROR] teachersList: ${response.statusCode} ${data['code']} ${data['msg']} ${response.body}');
+          CustomScaffoldMessenger.showErrorMessageSnackBar(
+            context,
+            '${response.statusCode} ${data['code']} 教師列表載入失敗',
+          );
         }
       } else {
         teachersList = [];
         debugPrint(
             '[ERROR] teachersList: ${response.statusCode} ${response.body}');
+        CustomScaffoldMessenger.showErrorMessageSnackBar(
+          context,
+          '${response.statusCode} 教師列表載入失敗',
+        );
       }
     });
   }
@@ -144,11 +161,19 @@ class _CommentPageState extends State<CommentPage> {
             departmentList = {};
             debugPrint(
                 '[ERROR] departmentList: ${response.statusCode} ${data['code']} ${data['msg']} ${response.body}');
+            CustomScaffoldMessenger.showErrorMessageSnackBar(
+              context,
+              '${response.statusCode} ${data['code']} 系所列表載入失敗',
+            );
           }
         } else {
           departmentList = {};
           debugPrint(
               '[ERROR] departmentList: ${response.statusCode} ${response.body}');
+          CustomScaffoldMessenger.showErrorMessageSnackBar(
+            context,
+            '${response.statusCode} 系所列表載入失敗',
+          );
         }
       },
     );
@@ -212,9 +237,17 @@ class _CommentPageState extends State<CommentPage> {
         } else {
           debugPrint(
               '[ERROR] search: ${response.statusCode} ${data['code']} ${data['msg']} ${response.body}');
+          CustomScaffoldMessenger.showErrorMessageSnackBar(
+            context,
+            '${response.statusCode} ${data['code']} 搜尋失敗',
+          );
         }
       } else {
         debugPrint('[ERROR] search: ${response.statusCode} ${response.body}');
+        CustomScaffoldMessenger.showErrorMessageSnackBar(
+          context,
+          '${response.statusCode} 搜尋失敗',
+        );
       }
       setState(() {
         _isSearching = false;
@@ -223,12 +256,33 @@ class _CommentPageState extends State<CommentPage> {
   }
 
   bool isSpam(String comment) {
-    // TODO: 加上其他檢測方案
+    int spamCount = 0;
+
+    // 檢測關鍵字
     for (var spam in ['湊三篇']) {
       if (comment.contains(spam)) {
-        return true;
+        spamCount++;
       }
     }
+
+    // TODO: 加上其他檢測方案
+
+    // 設定判定為垃圾評論的門檻
+    if (spamCount >= 1) {
+      // 晚1秒再顯示訊息，避免在build的時候呼叫造成error
+      // 1秒是不是最好的尚未驗證
+      Future.delayed(const Duration(seconds: 1), () {
+        // 先清空排程，避免有多個垃圾評論時，訊息重複顯示
+        ScaffoldMessenger.of(context).clearSnackBars();
+        CustomScaffoldMessenger.showMessageSnackBar(
+          context,
+          '已自動摺疊疑似垃圾評論',
+        );
+      });
+      return true;
+    }
+
+    // 都沒有檢測到，就不是垃圾評論
     return false;
   }
 
@@ -261,6 +315,11 @@ class _CommentPageState extends State<CommentPage> {
               children: [
                 CustomCard(
                   child: CustomExpansionTile(
+                    onExpansionChanged: (value) {
+                      if (_searchResult == null) {
+                        _expansionTileController.expand();
+                      }
+                    },
                     controller: _expansionTileController,
                     title: const Text('搜尋'),
                     subtitle: const Text('想以什麼條件搜尋？'),
