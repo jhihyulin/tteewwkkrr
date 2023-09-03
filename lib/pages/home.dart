@@ -147,7 +147,7 @@ class _HomePageState extends State<HomePage> {
                             AsyncSnapshot<PackageInfo> snapshot) {
                           if (snapshot.hasData) {
                             return Text(
-                                '${snapshot.data!.version}+${snapshot.data!.buildNumber}');
+                                'v${snapshot.data!.version}${snapshot.data?.buildNumber == '' ? '' : '+${snapshot.data!.buildNumber}'}');
                           } else {
                             return const Text('Loading...');
                           }
