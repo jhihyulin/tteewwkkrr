@@ -35,6 +35,7 @@ class _CommentPageState extends State<CommentPage> {
   late String? _selectedSemester;
   late String? _selectedHard;
   late String? _selectedRecommend;
+  late ScrollController _scrollController;
   final _maximumRead = 100;
   final List<String> _recommendList = [
     '非常不推薦',
@@ -67,6 +68,7 @@ class _CommentPageState extends State<CommentPage> {
     _selectedRecommend = null;
     _searchResult = null;
     _isSearching = false;
+    _scrollController = ScrollController();
     getCourses();
     getTeachers();
     getDepartments();
@@ -232,6 +234,17 @@ class _CommentPageState extends State<CommentPage> {
             _searchResult = result;
           });
           // debugPrint('search: ${result.toString()}');
+          _scrollController.animateTo(
+            MediaQuery.of(context).size.width > 700
+                ? 320
+                : MediaQuery.of(context).size.width > 500
+                    ? 386
+                    : MediaQuery.of(context).size.width >= 400
+                        ? 514
+                        : 580,
+            duration: const Duration(seconds: 1),
+            curve: Curves.easeInOut,
+          );
         } else {
           debugPrint(
               '[ERROR] search: ${response.statusCode} ${data['code']} ${data['msg']} ${response.body}');
@@ -449,6 +462,7 @@ class _CommentPageState extends State<CommentPage> {
         title: const Text('搜尋課程評論'),
       ),
       body: SingleChildScrollView(
+        controller: _scrollController,
         physics: const BouncingScrollPhysics(),
         child: Center(
           child: Container(
@@ -842,24 +856,30 @@ class _CommentPageState extends State<CommentPage> {
                               const SizedBox(
                                 height: 10,
                               ),
-                              ElevatedButton.icon(
-                                icon: const Icon(Icons.search),
-                                label: const Text('搜尋'),
-                                onPressed: () {
-                                  if (_formKey.currentState!.validate()) {
-                                    _formKey.currentState!.save();
-                                    search(
-                                      null,
-                                      _selectedSemester,
-                                      _selectedCourse,
-                                      _selectedDepartment,
-                                      _selectedTeacher,
-                                      _selectedHard,
-                                      _selectedRecommend,
-                                    );
-                                  }
-                                },
-                              ),
+                              if (!_isSearching)
+                                ElevatedButton.icon(
+                                  icon: const Icon(Icons.search),
+                                  label: const Text('搜尋'),
+                                  onPressed: () {
+                                    if (_formKey.currentState!.validate()) {
+                                      _formKey.currentState!.save();
+                                      search(
+                                        null,
+                                        _selectedSemester,
+                                        _selectedCourse,
+                                        _selectedDepartment,
+                                        _selectedTeacher,
+                                        _selectedHard,
+                                        _selectedRecommend,
+                                      );
+                                    }
+                                  },
+                                ),
+                              if (_isSearching)
+                                Container(
+                                  padding: const EdgeInsets.all(4),
+                                  child: const CustomLinearProgressIndicator(),
+                                ),
                               const SizedBox(
                                 height: 10,
                               ),
@@ -870,11 +890,6 @@ class _CommentPageState extends State<CommentPage> {
                     ],
                   ),
                 ),
-                if (_isSearching)
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    child: const CustomLinearProgressIndicator(),
-                  ),
                 // 統計平均數值
                 if (_searchResult != null && _searchResult!.isNotEmpty)
                   CustomCard(
@@ -1015,7 +1030,7 @@ class _CommentPageState extends State<CommentPage> {
                           title: const Text('搜尋結果'),
                           subtitle: Text(_searchResult!.isEmpty
                               ? '沒有搜尋結果'
-                              : '${_searchResult!.length}筆搜尋結果${_searchResult!.length > _maximumRead ? '，僅顯示前$_maximumRead筆' : ''}'),
+                              : '共${_searchResult!.length}筆搜尋結果${_searchResult!.length > _maximumRead ? '，目前僅顯示前$_maximumRead筆' : ''}'),
                           leading: const Icon(Icons.search),
                           trailing: IconButton(
                             icon: const Icon(Icons.close),
