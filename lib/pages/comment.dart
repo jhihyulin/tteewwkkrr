@@ -1061,11 +1061,14 @@ class _CommentPageState extends State<CommentPage> {
                                   width: double.infinity,
                                   child: Column(
                                     children: [
-                                      SizedBox(
-                                        width: double.infinity,
-                                        child: Text(
-                                          '${i['comment']}',
-                                          textAlign: TextAlign.left,
+                                      SelectionArea(
+                                        child: SizedBox(
+                                          width: double.infinity,
+                                          child: Text(
+                                            // deal html tag <br/>
+                                            '${i['comment'].replaceAll('<br/>', '\n')}',
+                                            textAlign: TextAlign.left,
+                                          ),
                                         ),
                                       ),
                                     ],
