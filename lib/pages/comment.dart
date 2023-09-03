@@ -875,11 +875,7 @@ class _CommentPageState extends State<CommentPage> {
                                     }
                                   },
                                 ),
-                              if (_isSearching)
-                                Container(
-                                  padding: const EdgeInsets.all(4),
-                                  child: const CustomLinearProgressIndicator(),
-                                ),
+                              if (_isSearching) const CustomLinearProgressIndicator(),
                               const SizedBox(
                                 height: 10,
                               ),
