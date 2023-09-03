@@ -19,6 +19,7 @@ class CommentPage extends StatefulWidget {
 
 class _CommentPageState extends State<CommentPage> {
   final _formKey = GlobalKey<FormState>();
+  // 由於mixed content問題(原點tewkr.com沒有SSL)，所以用cloudfare worker來做代理
   final baseURL = 'https://tteewwkkrr.jhihyulin.workers.dev/api';
   late List<String> coursesList;
   late List<String> teachersList;
