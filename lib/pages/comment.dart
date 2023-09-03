@@ -35,7 +35,6 @@ class _CommentPageState extends State<CommentPage> {
   late String? _selectedSemester;
   late String? _selectedHard;
   late String? _selectedRecommend;
-  late ExpansionTileController _expansionTileController;
   final _maximumRead = 100;
   final List<String> _recommendList = [
     '非常不推薦',
@@ -68,7 +67,6 @@ class _CommentPageState extends State<CommentPage> {
     _selectedRecommend = null;
     _searchResult = null;
     _isSearching = false;
-    _expansionTileController = ExpansionTileController();
     getCourses();
     getTeachers();
     getDepartments();
@@ -233,7 +231,6 @@ class _CommentPageState extends State<CommentPage> {
           setState(() {
             _searchResult = result;
           });
-          _expansionTileController.collapse();
           // debugPrint('search: ${result.toString()}');
         } else {
           debugPrint(
@@ -291,7 +288,6 @@ class _CommentPageState extends State<CommentPage> {
     setState(() {
       _searchResult = null;
     });
-    _expansionTileController.expand();
   }
 
   Widget colorBall(String grad, bool reverse) {
@@ -467,18 +463,13 @@ class _CommentPageState extends State<CommentPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 CustomCard(
-                  child: CustomExpansionTile(
-                    onExpansionChanged: (value) {
-                      if (_searchResult == null) {
-                        _expansionTileController.expand();
-                      }
-                    },
-                    controller: _expansionTileController,
-                    title: const Text('搜尋'),
-                    subtitle: const Text('想以什麼條件搜尋？'),
-                    leading: const Icon(Icons.search),
-                    initiallyExpanded: true,
+                  child: Column(
                     children: [
+                      const ListTile(
+                        title: Text('搜尋'),
+                        subtitle: Text('想以什麼條件搜尋？'),
+                        leading: Icon(Icons.search),
+                      ),
                       Container(
                         padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                         child: Form(
