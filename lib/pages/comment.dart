@@ -234,17 +234,27 @@ class _CommentPageState extends State<CommentPage> {
             _searchResult = result;
           });
           // debugPrint('search: ${result.toString()}');
-          _scrollController.animateTo(
-            MediaQuery.of(context).size.width > 700
-                ? 320
-                : MediaQuery.of(context).size.width > 500
-                    ? 386
-                    : MediaQuery.of(context).size.width >= 400
-                        ? 514
-                        : 580,
-            duration: const Duration(seconds: 1),
-            curve: Curves.easeInOut,
-          );
+          Future.delayed(const Duration(seconds: 1), () {
+            _scrollController.animateTo(
+              MediaQuery.of(context).size.width > 700
+                  ? 320 > _scrollController.position.maxScrollExtent
+                      ? _scrollController.position.maxScrollExtent
+                      : 320
+                  : MediaQuery.of(context).size.width > 500
+                      ? 386 > _scrollController.position.maxScrollExtent
+                          ? _scrollController.position.maxScrollExtent
+                          : 386
+                      : MediaQuery.of(context).size.width >= 400
+                          ? 514 > _scrollController.position.maxScrollExtent
+                              ? _scrollController.position.maxScrollExtent
+                              : 514
+                          : 580 > _scrollController.position.maxScrollExtent
+                              ? _scrollController.position.maxScrollExtent
+                              : 580,
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeInOut,
+            );
+          });
         } else {
           debugPrint(
               '[ERROR] search: ${response.statusCode} ${data['code']} ${data['msg']} ${response.body}');
@@ -875,7 +885,8 @@ class _CommentPageState extends State<CommentPage> {
                                     }
                                   },
                                 ),
-                              if (_isSearching) const CustomLinearProgressIndicator(),
+                              if (_isSearching)
+                                const CustomLinearProgressIndicator(),
                               const SizedBox(
                                 height: 10,
                               ),
