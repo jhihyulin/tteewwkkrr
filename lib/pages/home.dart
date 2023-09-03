@@ -68,12 +68,12 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Center(
-          child: Column(
-            children: [
-              Container(
+      body: Center(
+        child: Column(
+          children: [
+            Expanded(
+              flex: 1,
+              child: Container(
                 constraints: const BoxConstraints(
                   maxWidth: 600,
                 ),
@@ -132,31 +132,44 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              Container(
-                alignment: Alignment.center,
-                child: FutureBuilder(
-                  future: PackageInfo.fromPlatform(),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<PackageInfo> snapshot) {
-                    if (snapshot.hasData) {
-                      return Text(
-                          '${snapshot.data!.version}+${snapshot.data!.buildNumber}');
-                    } else {
-                      return const Text('Loading...');
-                    }
-                  },
-                ),
+            ),
+            Expanded(
+              flex: 0,
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      alignment: Alignment.center,
+                      child: FutureBuilder(
+                        future: PackageInfo.fromPlatform(),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<PackageInfo> snapshot) {
+                          if (snapshot.hasData) {
+                            return Text(
+                                '${snapshot.data!.version}+${snapshot.data!.buildNumber}');
+                          } else {
+                            return const Text('Loading...');
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 0,
+                    child: IconButton(
+                      icon: const Icon(FontAwesome.github),
+                      onPressed: () {
+                        CustomLaunchUrl.launch(
+                            context, 'https://github.com/jhihyulin/tteewwkkrr');
+                      },
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      ),
-      floatingActionButton: IconButton(
-        icon: const Icon(FontAwesome.github),
-        onPressed: () {
-          CustomLaunchUrl.launch(
-              context, 'https://github.com/jhihyulin/tteewwkkrr');
-        },
       ),
     );
   }
