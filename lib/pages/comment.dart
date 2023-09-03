@@ -19,7 +19,7 @@ class CommentPage extends StatefulWidget {
 
 class _CommentPageState extends State<CommentPage> {
   final _formKey = GlobalKey<FormState>();
-  final baseURL = 'http://tewkr.com/api';
+  final baseURL = 'https://tteewwkkrr.jhihyulin.workers.dev/api';
   late List<String> coursesList;
   late List<String> teachersList;
   late Map<String, List<String>> departmentList;
