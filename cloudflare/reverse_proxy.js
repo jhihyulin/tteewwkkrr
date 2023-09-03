@@ -1,5 +1,5 @@
-// ¤Ï¦V¥N²z³¡¸p¦bcoudfare workers¤W
-// ¥Î©ó¸Ñ¨Mmixed content°İÃD
+// åå‘ä»£ç†éƒ¨ç½²åœ¨coudfare workersä¸Š
+// ç”¨æ–¼è§£æ±ºmixed contentå•é¡Œ
 
 export default {
     async fetch(request, env, ctx) {
