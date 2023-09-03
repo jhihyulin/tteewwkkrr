@@ -915,89 +915,95 @@ class _CommentPageState extends State<CommentPage> {
                         var recommendAvg = recommendSum / recommend.length;
                         var hardAvg = hardSum / hard.length;
                         return CustomExpansionTile(
-                            title: const Text('統計'),
-                            subtitle: const Text('平均數值'),
-                            leading: const Icon(Icons.bar_chart),
-                            initiallyExpanded: false,
-                            trailing: doubleColorBall(
-                              recommendAvg > 4.5
-                                  ? 'A'
-                                  : recommendAvg > 3.5
-                                      ? 'B'
-                                      : recommendAvg > 2.5
-                                          ? 'C'
-                                          : recommendAvg > 1.5
-                                              ? 'D'
-                                              : 'E',
-                              hardAvg > 4.5
-                                  ? 'A'
-                                  : hardAvg > 3.5
-                                      ? 'B'
-                                      : hardAvg > 2.5
-                                          ? 'C'
-                                          : hardAvg > 1.5
-                                              ? 'D'
-                                              : 'E',
+                          title: const Text('統計'),
+                          subtitle: const Text('平均數值'),
+                          leading: const Icon(Icons.bar_chart),
+                          initiallyExpanded: false,
+                          trailing: doubleColorBall(
+                            recommendAvg > 4.5
+                                ? 'A'
+                                : recommendAvg > 3.5
+                                    ? 'B'
+                                    : recommendAvg > 2.5
+                                        ? 'C'
+                                        : recommendAvg > 1.5
+                                            ? 'D'
+                                            : 'E',
+                            hardAvg > 4.5
+                                ? 'A'
+                                : hardAvg > 3.5
+                                    ? 'B'
+                                    : hardAvg > 2.5
+                                        ? 'C'
+                                        : hardAvg > 1.5
+                                            ? 'D'
+                                            : 'E',
+                          ),
+                          // 表格 縱向分別是難度及推薦度，橫向分別是五級顏色的球，顏色由紅到綠，內度數值為該顏色(等級)的數量
+                          children: [
+                            const SizedBox(
+                              height: 5,
                             ),
-                            // 表格 縱向分別是難度及推薦度，橫向分別是五級顏色的球，顏色由紅到綠，內度數值為該顏色(等級)的數量
-                            children: [
-                              Table(
-                                children: [
-                                  TableRow(
-                                    children: [
-                                      const Text(
-                                        '數量',
+                            Table(
+                              children: [
+                                TableRow(
+                                  children: [
+                                    const Text(
+                                      '數量',
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    for (var i = 'A';
+                                        i != 'F';
+                                        i = String.fromCharCode(
+                                            i.codeUnitAt(0) + 1))
+                                      colorBall(i, false),
+                                  ],
+                                ),
+                                TableRow(
+                                  children: [
+                                    const Text(
+                                      '推薦度',
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    for (var i = 'A';
+                                        i != 'F';
+                                        i = String.fromCharCode(
+                                            i.codeUnitAt(0) + 1))
+                                      Text(
+                                        recommend
+                                            .where((element) => element == i)
+                                            .length
+                                            .toString(),
                                         textAlign: TextAlign.center,
                                       ),
-                                      for (var i = 'A';
-                                          i != 'F';
-                                          i = String.fromCharCode(
-                                              i.codeUnitAt(0) + 1))
-                                        colorBall(i, false),
-                                    ],
-                                  ),
-                                  TableRow(
-                                    children: [
-                                      const Text(
-                                        '推薦度',
+                                  ],
+                                ),
+                                TableRow(
+                                  children: [
+                                    const Text(
+                                      '難度',
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    for (var i = 'E';
+                                        i != '@'; // utf16下 A的前一個字元 0041 -> 0040
+                                        i = String.fromCharCode(
+                                            i.codeUnitAt(0) - 1))
+                                      Text(
+                                        hard
+                                            .where((element) => element == i)
+                                            .length
+                                            .toString(),
                                         textAlign: TextAlign.center,
                                       ),
-                                      for (var i = 'A';
-                                          i != 'F';
-                                          i = String.fromCharCode(
-                                              i.codeUnitAt(0) + 1))
-                                        Text(
-                                          recommend
-                                              .where((element) => element == i)
-                                              .length
-                                              .toString(),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                    ],
-                                  ),
-                                  TableRow(
-                                    children: [
-                                      const Text(
-                                        '難度',
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      for (var i = 'E';
-                                          i !=
-                                              '@'; // utf16下 A的前一個字元 0041 -> 0040
-                                          i = String.fromCharCode(
-                                              i.codeUnitAt(0) - 1))
-                                        Text(
-                                          hard
-                                              .where((element) => element == i)
-                                              .length
-                                              .toString(),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                    ],
-                                  ),
-                                ],
-                              )
-                            ]);
+                                  ],
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                          ],
+                        );
                       },
                     ),
                   ),
