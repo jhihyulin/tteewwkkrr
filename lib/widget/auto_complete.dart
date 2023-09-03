@@ -43,9 +43,10 @@ class _CustomAutocomplete extends State<CustomAutocomplete> {
             clipBehavior: Clip.antiAlias,
             elevation: 4.0,
             child: Container(
-              height: 200.0,
               constraints: BoxConstraints(
-                  maxWidth: widget.optionsMaxWidth ?? double.infinity),
+                maxWidth: widget.optionsMaxWidth ?? double.infinity,
+                maxHeight: 200,
+              ),
               child: ListView.builder(
                 itemCount: options.length,
                 itemBuilder: (BuildContext context, int index) {
