@@ -16,20 +16,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _tapCount = 0;
-  final List<String> _tapTextList = [
-    '開發中',
-    '再說一次開發中',
-    '再再說一次開發中',
-    '再再再說一次開發中',
-    '就跟你說開發中了',
-    '你還點啊',
-    '點幾次都沒用',
-    '幹就還沒做好啦',
-    '再點我就把你的手剁掉',
-    ' 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕 🖕'
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,21 +91,10 @@ class _HomePageState extends State<HomePage> {
                             },
                             trailing: const Icon(Icons.chevron_right),
                           ),
-                          // TODO: 完成搜尋加簽資訊
                           ListTile(
                             title: const Text('搜尋加簽資訊'),
-                            subtitle: const Text('開發中'),
                             onTap: () {
-                              ScaffoldMessenger.of(context)
-                                  .hideCurrentSnackBar();
-                              CustomScaffoldMessenger.showMessageSnackBar(
-                                  context,
-                                  _tapTextList[_tapCount >= _tapTextList.length
-                                      ? _tapTextList.length - 1
-                                      : _tapCount]);
-                              setState(() {
-                                _tapCount++;
-                              });
+                              Navigator.pushNamed(context, '/signable');
                             },
                             trailing: const Icon(Icons.chevron_right),
                           ),
