@@ -7,6 +7,7 @@ import '../pages/home.dart';
 import '../pages/load_failed.dart';
 import '../pages/not_found.dart' deferred as not_found;
 import '../pages/comment.dart' deferred as comment;
+import '../pages/signable.dart' deferred as signable;
 import '../pages/loading.dart';
 import '../provider/theme.dart';
 
@@ -103,6 +104,11 @@ class _MyAppState extends State<MyApp> {
                 case '/comment':
                   builder = loadPage(comment.loadLibrary, (context) {
                     return comment.CommentPage();
+                  });
+                  break;
+                case '/signable':
+                  builder = loadPage(signable.loadLibrary, (context) {
+                    return signable.SignablePage();
                   });
                   break;
                 case '/':
